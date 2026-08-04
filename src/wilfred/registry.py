@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from wilfred.models import ToolDefinition
 
 
@@ -23,3 +25,17 @@ class ToolRegistry:
 
     def names(self) -> list[str]:
         return sorted(self._tools.keys())
+
+    def execute(
+        self,
+        name: str,
+        **arguments: Any,
+    ) -> Any:
+        tool = self.get(name)
+
+        if tool is None:
+            raise KeyError(
+                f"Tool not registered: {name}"
+            )
+
+        return tool.handler(**arguments)
