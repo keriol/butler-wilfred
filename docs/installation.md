@@ -14,40 +14,40 @@ Wilfred currently requires:
 
 Check the Python version:
 
-~~bash
+```bash
 python3.12 --version
-~~
+```
 
 ## Create an isolated environment
 
 From the repository root:
 
-~~bash
+```bash
 python3.12 -m venv .venv
 . .venv/bin/activate
-~~
+```
 
 On Windows PowerShell, activate it with:
 
-~~powershell
+```powershell
 .\.venv\Scripts\Activate.ps1
-~~
+```
 
 Confirm that the isolated interpreter is active:
 
-~~bash
+```bash
 python --version
 python -m pip --version
-~~
+```
 
 ## Install from the source checkout
 
 Install the local project:
 
-~~bash
+```bash
 python -m pip install --upgrade pip setuptools
 python -m pip install --no-build-isolation .
-~~
+```
 
 This creates the `wilfred` command inside the virtual environment.
 
@@ -56,29 +56,29 @@ installation are not automatically reflected in the installed package.
 
 For development work, an editable installation can instead be created with:
 
-~~bash
+```bash
 python -m pip install --no-build-isolation --editable .
-~~
+```
 
 ## First run
 
 Start the standalone runtime:
 
-~~bash
+```bash
 wilfred
-~~
+```
 
 Expected output:
 
-~~json
+```json
 {"name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.1.0"}
-~~
+```
 
 The module entrypoint is equivalent:
 
-~~bash
+```bash
 python -m wilfred
-~~
+```
 
 ## Verify the public plugin contract
 
@@ -86,7 +86,7 @@ Wilfred includes a harmless read-only example plugin named `demo.echo`.
 
 Run this example from the activated virtual environment:
 
-~~bash
+```bash
 python - <<'PY'
 from wilfred import (
     ToolRegistry,
@@ -114,14 +114,14 @@ print(f"Plugins: {load_results}")
 print(f"Tools:   {registry.names()}")
 print(f"Result:  {result}")
 PY
-~~
+```
 
 Expected result:
 
-~~text
+```text
 Tools:   ['demo_echo']
 Result:  {'message': 'Hello from Wilfred'}
-~~
+```
 
 The example demonstrates the public plugin lifecycle:
 
@@ -135,15 +135,15 @@ The example demonstrates the public plugin lifecycle:
 
 From the repository root:
 
-~~bash
+```bash
 PYTHONPATH=src python -m unittest discover -s tests -v
-~~
+```
 
 To run only the distribution isolation test:
 
-~~bash
+```bash
 PYTHONPATH=src python -m unittest     tests.test_distribution_clean_room     -v
-~~
+```
 
 The clean-room test:
 
@@ -159,20 +159,20 @@ The clean-room test:
 
 Create a local wheel without downloading build dependencies:
 
-~~bash
+```bash
 python -m pip wheel     --no-deps     --no-build-isolation     --wheel-dir dist     .
-~~
+```
 
 Install the generated wheel in another environment:
 
-~~bash
+```bash
 python -m pip install --no-deps dist/wilfred_butler-*.whl
-~~
+```
 
 ## Uninstall
 
 From the activated virtual environment:
 
-~~bash
+```bash
 python -m pip uninstall wilfred-butler
-~~
+```

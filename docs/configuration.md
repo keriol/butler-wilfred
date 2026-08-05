@@ -12,20 +12,20 @@ The built-in defaults are:
 
 Pass an explicit TOML file with `--config`:
 
-~bash
+```bash
 wilfred --config examples/wilfred.toml
-~
+```
 
 The supported structure is:
 
-~toml
+```toml
 [identity]
 name = "Wilfred"
 locale = "en"
 
 [runtime]
 log_level = "INFO"
-~
+```
 
 Unknown sections and keys are rejected so that misspelled or obsolete
 settings do not silently change runtime behaviour.
@@ -42,30 +42,30 @@ The following variables are supported:
 
 Example:
 
-~bash
+```bash
 WILFRED_LOCALE=it-IT WILFRED_LOG_LEVEL=DEBUG wilfred
-~
+```
 
 ## Command-line overrides
 
 The public entrypoint supports:
 
-~text
+```text
 --config PATH
 --name NAME
 --locale LOCALE
 --log-level LEVEL
-~
+```
 
 Example:
 
-~bash
+```bash
 wilfred \
   --config examples/wilfred.toml \
   --name "House Butler" \
   --locale it-IT \
   --log-level WARNING
-~
+```
 
 ## Precedence
 
