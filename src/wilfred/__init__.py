@@ -6,6 +6,14 @@ from wilfred.config import (
     RuntimeConfig,
     load_config,
 )
+from wilfred.execution import (
+    ExecutionEngine,
+    ExecutionPolicy,
+    ExecutionRequest,
+    ExecutionResult,
+    ExecutionStatus,
+    validate_arguments,
+)
 from wilfred.models import ToolDefinition, ToolPermission
 from wilfred.plugins import (
     PluginDefinition,
@@ -22,6 +30,11 @@ __version__ = "0.1.0"
 __all__ = [
     "ButlerIdentity",
     "ConfigurationError",
+    "ExecutionEngine",
+    "ExecutionPolicy",
+    "ExecutionRequest",
+    "ExecutionResult",
+    "ExecutionStatus",
     "PluginDefinition",
     "PluginLoadResult",
     "RuntimeConfig",
@@ -32,5 +45,6 @@ __all__ = [
     "load_config",
     "load_plugin",
     "load_plugins",
+    "validate_arguments",
     "__version__",
 ]

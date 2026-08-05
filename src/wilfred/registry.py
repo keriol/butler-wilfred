@@ -1,8 +1,12 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from wilfred.models import ToolDefinition
+
+
+if TYPE_CHECKING:
+    from wilfred.execution import ExecutionResult
 
 
 class ToolRegistry:
@@ -30,12 +34,15 @@ class ToolRegistry:
         self,
         name: str,
         **arguments: Any,
-    ) -> Any:
-        tool = self.get(name)
+    ) -> "ExecutionResult":
+        from wilfred.execution import (
+            ExecutionEngine,
+            ExecutionRequest,
+        )
 
-        if tool is None:
-            raise KeyError(
-                f"Tool not registered: {name}"
+        return ExecutionEngine(self).execute(
+            ExecutionRequest(
+                tool_name=name,
+                arguments=arguments,
             )
-
-        return tool.handler(**arguments)
+        )

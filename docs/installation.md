@@ -71,7 +71,7 @@ wilfred
 Expected output:
 
 ```json
-{"name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.1.0"}
+{"locale": "en", "log_level": "INFO", "name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.1.0"}
 ```
 
 The module entrypoint is equivalent:
@@ -89,6 +89,8 @@ Run this example from the activated virtual environment:
 ```bash
 python - <<'PY'
 from wilfred import (
+    ExecutionEngine,
+    ExecutionRequest,
     ToolRegistry,
     discover_plugins,
     load_plugins,
@@ -105,14 +107,21 @@ load_results = load_plugins(
     plugins,
 )
 
-result = registry.execute(
-    "demo_echo",
-    message="Hello from Wilfred",
+engine = ExecutionEngine(registry)
+
+result = engine.execute(
+    ExecutionRequest(
+        tool_name="demo_echo",
+        arguments={
+            "message": "Hello from Wilfred",
+        },
+    )
 )
 
 print(f"Plugins: {load_results}")
 print(f"Tools:   {registry.names()}")
-print(f"Result:  {result}")
+print(f"Status:  {result.status.value}")
+print(f"Result:  {result.value}")
 PY
 ```
 
@@ -120,6 +129,7 @@ Expected result:
 
 ```text
 Tools:   ['demo_echo']
+Status:  success
 Result:  {'message': 'Hello from Wilfred'}
 ```
 
@@ -129,7 +139,7 @@ The example demonstrates the public plugin lifecycle:
 2. discover its `PluginDefinition`;
 3. validate its name and registration callable;
 4. register its tools deterministically;
-5. execute a tool through `ToolRegistry`.
+5. execute the tool through the public `ExecutionEngine`.
 
 ## Run the public test suite
 

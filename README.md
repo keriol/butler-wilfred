@@ -7,6 +7,7 @@ It provides:
 
 - typed tool definitions and permission levels;
 - a deterministic tool registry;
+- a structured Execution Engine with validation, policy and timeouts;
 - a public plugin contract and loader;
 - a standalone command-line entrypoint;
 - an example read-only plugin;
@@ -48,6 +49,33 @@ procedure, plugin example and verification commands.
 
 See [Runtime configuration](docs/configuration.md) for TOML, environment
 variables, command-line overrides, validation and precedence.
+
+See [Execution Engine](docs/execution-engine.md) for argument validation,
+permissions, confirmations, timeouts and structured results.
+
+## Current development status
+
+Wilfred currently provides:
+
+- a standalone public runtime;
+- autonomous identity and configuration;
+- public tool and plugin contracts;
+- deterministic plugin loading;
+- a native Execution Engine;
+- clean-room wheel verification without Alfred or another consumer.
+
+The following capabilities are still under development and are not presented
+as available:
+
+- native Butler capabilities;
+- READ-ACTION-VERIFY workflows;
+- local persistence;
+- goal-oriented CLI and API;
+- the public Home Assistant adapter;
+- the Wilfred `0.2.0` public alpha.
+
+The crowdfunding campaign will only launch after the `0.2.0` release exists
+and Wilfred can demonstrate useful native behaviour.
 
 ## Development
 

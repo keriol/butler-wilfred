@@ -147,6 +147,9 @@ import sys
 
 import wilfred
 from wilfred import (
+    ExecutionEngine,
+    ExecutionRequest,
+    ExecutionStatus,
     ToolPermission,
     ToolRegistry,
     discover_plugins,
@@ -174,13 +177,23 @@ results = load_plugins(registry, plugins)
 
 tool = registry.get("demo_echo")
 
-first = registry.execute(
-    "demo_echo",
-    message="clean-room",
+engine = ExecutionEngine(registry)
+
+first = engine.execute(
+    ExecutionRequest(
+        tool_name="demo_echo",
+        arguments={
+            "message": "clean-room",
+        },
+    )
 )
-second = registry.execute(
-    "demo_echo",
-    message="clean-room",
+second = engine.execute(
+    ExecutionRequest(
+        tool_name="demo_echo",
+        arguments={
+            "message": "clean-room",
+        },
+    )
 )
 
 if tool is None:
@@ -189,12 +202,22 @@ if tool is None:
 if tool.permission is not ToolPermission.READ:
     raise RuntimeError("Unexpected demo permission.")
 
-if first != second:
+if first.status is not ExecutionStatus.SUCCESS:
+    raise RuntimeError(
+        "Demo execution did not succeed."
+    )
+
+if second.status is not ExecutionStatus.SUCCESS:
+    raise RuntimeError(
+        "Second demo execution did not succeed."
+    )
+
+if first.value != second.value:
     raise RuntimeError(
         "Demo execution is not deterministic."
     )
 
-if first != {"message": "clean-room"}:
+if first.value != {"message": "clean-room"}:
     raise RuntimeError(
         "Unexpected demo execution result."
     )
@@ -205,7 +228,9 @@ print(
             "module": str(module_path),
             "plugin": plugins[0].name,
             "tools": registry.names(),
-            "result": first,
+            "result": first.value,
+            "execution_status": first.status.value,
+            "execution_id": first.execution_id,
             "load_results": len(results),
         },
         sort_keys=True,
@@ -239,6 +264,13 @@ print(
             self.assertEqual(
                 payload["result"],
                 {"message": "clean-room"},
+            )
+            self.assertEqual(
+                payload["execution_status"],
+                "success",
+            )
+            self.assertTrue(
+                payload["execution_id"],
             )
 
             entrypoint = _run(

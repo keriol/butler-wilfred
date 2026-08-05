@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import unittest
 
-from wilfred import ToolPermission, ToolRegistry
+from wilfred import (
+    ExecutionStatus,
+    ToolPermission,
+    ToolRegistry,
+)
 from wilfred.plugins import (
     PluginDefinition,
     discover_plugins,
@@ -109,21 +113,33 @@ class WilfredPluginTests(unittest.TestCase):
         )
 
         self.assertEqual(
-            first,
+            first.status,
+            ExecutionStatus.SUCCESS,
+        )
+        self.assertEqual(
+            first.value,
             {
                 "message": "hello",
             },
         )
-        self.assertEqual(first, second)
+        self.assertEqual(
+            first.value,
+            second.value,
+        )
 
     def test_unknown_tool_is_rejected(self) -> None:
         registry = ToolRegistry()
 
-        with self.assertRaisesRegex(
-            KeyError,
-            "Tool not registered: missing",
-        ):
-            registry.execute("missing")
+        result = registry.execute("missing")
+
+        self.assertEqual(
+            result.status,
+            ExecutionStatus.TOOL_NOT_FOUND,
+        )
+        self.assertEqual(
+            result.error_code,
+            "tool_not_found",
+        )
 
 
 if __name__ == "__main__":
