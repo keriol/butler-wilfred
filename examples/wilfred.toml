@@ -1,0 +1,6 @@
+[identity]
+name = "Wilfred"
+locale = "en"
+
+[runtime]
+log_level = "INFO"

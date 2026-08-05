@@ -10,6 +10,7 @@ It provides:
 - a public plugin contract and loader;
 - a standalone command-line entrypoint;
 - an example read-only plugin;
+- standalone identity and runtime configuration;
 - public distribution and clean-room tests.
 
 ## Requirements
@@ -33,7 +34,7 @@ wilfred
 Expected output:
 
 ~~json
-{"name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.1.0"}
+{"locale": "en", "log_level": "INFO", "name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.1.0"}
 ~~
 
 The same runtime can also be started with:
@@ -44,6 +45,9 @@ python -m wilfred
 
 See [Installation and first run](docs/installation.md) for the complete
 procedure, plugin example and verification commands.
+
+See [Runtime configuration](docs/configuration.md) for TOML, environment
+variables, command-line overrides, validation and precedence.
 
 ## Development
 
