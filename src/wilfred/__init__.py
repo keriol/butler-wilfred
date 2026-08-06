@@ -15,6 +15,15 @@ from wilfred.execution import (
     validate_arguments,
 )
 from wilfred.models import ToolDefinition, ToolPermission
+from wilfred.output import (
+    OutputAdapter,
+    OutputCapability,
+    OutputDeliveryResult,
+    OutputDeliveryStatus,
+    OutputKind,
+    OutputPriority,
+    OutputRequest,
+)
 from wilfred.plugins import (
     PluginDefinition,
     PluginLoadResult,
@@ -35,6 +44,13 @@ __all__ = [
     "ExecutionRequest",
     "ExecutionResult",
     "ExecutionStatus",
+    "OutputAdapter",
+    "OutputCapability",
+    "OutputDeliveryResult",
+    "OutputDeliveryStatus",
+    "OutputKind",
+    "OutputPriority",
+    "OutputRequest",
     "PluginDefinition",
     "PluginLoadResult",
     "RuntimeConfig",

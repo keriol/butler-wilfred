@@ -105,3 +105,11 @@ Only reviewed, versioned, distribution-safe artifacts cross that boundary.
 See
 [ADR 0001: Separate Alfred and Wilfred project contexts](docs/adr/0001-chatgpt-project-boundary.md)
 for the ownership rules and publication checklist.
+
+## Provider-agnostic output
+
+Wilfred exposes public contracts for speech, notifications, sounds and
+display output without depending on a physical provider.
+
+See
+[ADR 0002: Provider-agnostic output contracts](docs/adr/0002-provider-agnostic-output.md).
