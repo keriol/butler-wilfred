@@ -113,3 +113,16 @@ display output without depending on a physical provider.
 
 See
 [ADR 0002: Provider-agnostic output contracts](docs/adr/0002-provider-agnostic-output.md).
+
+## Development
+
+Create a Python 3.12 environment and install the development extra:
+
+~~~bash
+python3.12 -m venv .venv
+.venv/bin/python -m pip install -e '.[dev]'
+.venv/bin/python -m pytest -q
+~~~
+
+See the [development guide](docs/development.md) for the complete
+compile, test, and clean-room workflow.
