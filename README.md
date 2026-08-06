@@ -96,3 +96,12 @@ documentation, tests and publishable plugins.
 
 Consumer-specific integrations, infrastructure details, credentials and
 operational configuration belong in separate repositories.
+
+## Project context boundary
+
+Wilfred and the private Alfred deployment use separate AI project contexts.
+Only reviewed, versioned, distribution-safe artifacts cross that boundary.
+
+See
+[ADR 0001: Separate Alfred and Wilfred project contexts](docs/adr/0001-chatgpt-project-boundary.md)
+for the ownership rules and publication checklist.
