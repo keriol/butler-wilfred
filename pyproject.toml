@@ -15,3 +15,10 @@ wilfred = "wilfred.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9,<10",
+    "setuptools>=68",
+    "wheel>=0.45",
+]
