@@ -26,3 +26,17 @@ Normal Wilfred installations do not install them.
 
 The suite includes the clean-room wheel test, which verifies that the
 public distribution works without another butler repository.
+
+## Versioning toward 0.2.0
+
+Wilfred uses the `0.1.x` series for small, verifiable milestones on the path
+to `0.2.0`.
+
+The current baseline is `0.1.6`.
+
+Subsequent `0.1.x` versions represent concrete increments in packaging,
+distribution, onboarding and public usability. They are milestones, not a
+literal percentage-complete scale.
+
+`0.2.0` remains the target for the first sufficiently installable and
+verified public release milestone.
