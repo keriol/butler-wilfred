@@ -1,0 +1,128 @@
+name: Wilfred Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build and publish release
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout tagged revision
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Verify release contract
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TAG="$GITHUB_REF_NAME"
+
+          if [[ ! "$TAG" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "Invalid release tag: $TAG"
+            exit 1
+          fi
+
+          VERSION="${BASH_REMATCH[1]}"
+
+          PACKAGE_VERSION="$(
+            python - <<'PY'
+          import tomllib
+          from pathlib import Path
+
+          data = tomllib.loads(
+              Path("pyproject.toml").read_text(encoding="utf-8")
+          )
+          print(data["project"]["version"])
+          PY
+          )"
+
+          echo "Tag version:     $VERSION"
+          echo "Package version: $PACKAGE_VERSION"
+
+          test "$PACKAGE_VERSION" = "$VERSION"
+
+          git fetch origin main:refs/remotes/origin/main
+          git merge-base --is-ancestor HEAD origin/main
+
+          echo "RELEASE_VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install build
+          python -m pip install -e ".[dev]"
+
+      - name: Compile and test
+        run: |
+          python -m compileall -q src tests
+          pytest -q
+
+      - name: Build distributions
+        run: |
+          python -m build
+          ls -lh dist/
+          test -n "$(find dist -maxdepth 1 -name '*.whl' -print -quit)"
+          test -n "$(find dist -maxdepth 1 -name '*.tar.gz' -print -quit)"
+
+      - name: Verify clean-room wheel
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python -m venv /tmp/wilfred-release-test
+          source /tmp/wilfred-release-test/bin/activate
+
+          python -m pip install --upgrade pip
+          python -m pip install dist/*.whl
+
+          python - <<'PY'
+          import os
+          from importlib.metadata import version
+          import wilfred
+
+          expected = os.environ["RELEASE_VERSION"]
+          metadata = version("wilfred-butler")
+
+          print("Expected:", expected)
+          print("Metadata:", metadata)
+          print("Runtime: ", wilfred.__version__)
+
+          assert metadata == expected
+          assert wilfred.__version__ == expected
+          PY
+
+          python -m pip check
+          wilfred --help
+          wilfred status
+          wilfred tools
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            dist/*.whl \
+            dist/*.tar.gz \
+            --verify-tag \
+            --title "Wilfred $GITHUB_REF_NAME" \
+            --generate-notes

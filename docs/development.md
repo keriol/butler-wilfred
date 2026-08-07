@@ -67,3 +67,18 @@ Commands:
 
 Running `wilfred` without a subcommand preserves the existing
 standalone bootstrap behavior.
+
+### Automated releases
+
+Stable Wilfred releases are published from immutable semantic-version
+tags such as `v0.1.7`.
+
+The release workflow verifies that the tag and package version match,
+that the tagged commit belongs to `main`, and that the public test
+suite passes. It then builds wheel and source distributions, verifies
+the wheel in a clean virtual environment, checks package dependencies
+and CLI entry points, and finally publishes the artifacts as a GitHub
+Release.
+
+Development versions such as `0.1.7.dev0` therefore cannot be
+published using a stable `v0.1.7` tag.
