@@ -13,6 +13,8 @@ from wilfred.config import (
     RuntimeConfig,
     load_config,
 )
+from wilfred.native import register_native_tools
+from wilfred.registry import ToolRegistry
 
 
 def runtime_status(
@@ -62,7 +64,50 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
 
+    commands = parser.add_subparsers(dest="command")
+
+    commands.add_parser(
+        "status",
+        help="Show Wilfred native runtime status.",
+    )
+    commands.add_parser(
+        "tools",
+        help="List Wilfred native capabilities.",
+    )
+
     return parser
+
+
+def run_native_command(command: str) -> int:
+    registry = ToolRegistry()
+    register_native_tools(registry)
+
+    tool_name = {
+        "status": "wilfred_status",
+        "tools": "wilfred_tools",
+    }[command]
+
+    result = registry.execute(tool_name)
+
+    if not result.ok:
+        print(
+            json.dumps(
+                result.to_dict(),
+                ensure_ascii=False,
+                sort_keys=True,
+            ),
+            file=sys.stderr,
+        )
+        return 1
+
+    print(
+        json.dumps(
+            result.value,
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+    )
+    return 0
 
 
 def main(
@@ -72,6 +117,9 @@ def main(
 ) -> int:
     parser = build_parser()
     arguments = parser.parse_args(argv)
+
+    if arguments.command is not None:
+        return run_native_command(arguments.command)
 
     try:
         config = load_config(
