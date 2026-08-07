@@ -40,3 +40,17 @@ literal percentage-complete scale.
 
 `0.2.0` remains the target for the first sufficiently installable and
 verified public release milestone.
+
+## Native capabilities
+
+Wilfred can provide capabilities through the same public tool contract used
+by plugins and integrations.
+
+The first built-in READ capabilities are:
+
+- `wilfred_status`: reports public runtime status and package version.
+- `wilfred_tools`: describes the tools currently registered in the runtime.
+
+Native capabilities are registered in `ToolRegistry` and executed through
+`ExecutionEngine`. They do not bypass validation, permissions or execution
+policy.

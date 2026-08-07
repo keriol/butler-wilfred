@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from importlib.metadata import version
+
 import unittest
 
 from wilfred import __version__
@@ -8,7 +10,7 @@ from wilfred.__main__ import runtime_status
 
 class WilfredBootstrapTests(unittest.TestCase):
     def test_package_version(self) -> None:
-        self.assertEqual(__version__, "0.1.0")
+        self.assertEqual(__version__, version("wilfred-butler"))
 
     def test_standalone_runtime_status(self) -> None:
         status = runtime_status()
