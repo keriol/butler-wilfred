@@ -1,5 +1,10 @@
 """Public Wilfred Butler runtime."""
 
+from importlib.metadata import (
+    PackageNotFoundError,
+    version as package_version,
+)
+
 from wilfred.config import (
     ButlerIdentity,
     ConfigurationError,
@@ -34,7 +39,10 @@ from wilfred.plugins import (
 from wilfred.registry import ToolRegistry
 
 
-__version__ = "0.1.0"
+try:
+    __version__ = package_version("wilfred-butler")
+except PackageNotFoundError:
+    __version__ = "0+unknown"
 
 __all__ = [
     "ButlerIdentity",
