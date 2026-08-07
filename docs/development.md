@@ -54,3 +54,16 @@ The first built-in READ capabilities are:
 Native capabilities are registered in `ToolRegistry` and executed through
 `ExecutionEngine`. They do not bypass validation, permissions or execution
 policy.
+
+### Native CLI capabilities
+
+Wilfred exposes its native READ capabilities through the same Tool
+Registry and Execution Engine used by registered tools.
+
+Commands:
+
+    wilfred status
+    wilfred tools
+
+Running `wilfred` without a subcommand preserves the existing
+standalone bootstrap behavior.
