@@ -1,22 +1,11 @@
-from __future__ import annotations
+"""Compatibility facade for shared Butler Core tool contracts."""
 
-from dataclasses import dataclass, field
-from enum import Enum
-from typing import Any, Callable
+from butler_core.models import (
+    ToolDefinition,
+    ToolPermission,
+)
 
-
-class ToolPermission(str, Enum):
-    READ = "READ"
-    ACTION = "ACTION"
-    DANGEROUS = "DANGEROUS"
-
-
-@dataclass(frozen=True)
-class ToolDefinition:
-    name: str
-    description: str
-    handler: Callable[..., Any]
-    parameters: dict[str, Any] = field(default_factory=dict)
-    category: str = "general"
-    permission: ToolPermission = ToolPermission.READ
-    timeout_seconds: int = 10
+__all__ = [
+    "ToolDefinition",
+    "ToolPermission",
+]

@@ -49,10 +49,21 @@ class DevelopmentEnvironmentTests(unittest.TestCase):
             {"pytest", "setuptools", "wheel"},
         )
 
-    def test_runtime_dependencies_remain_empty(self) -> None:
-        self.assertEqual(
-            self.load_project()["dependencies"],
-            [],
+    def test_runtime_dependency_is_butler_core(self) -> None:
+        dependencies = self.load_project()["dependencies"]
+
+        self.assertEqual(len(dependencies), 1)
+        self.assertTrue(
+            dependencies[0].startswith(
+                "butler-core @ "
+                "https://github.com/keriol/butler-core/"
+                "releases/download/v0.1.1/"
+                "butler_core-0.1.1-py3-none-any.whl"
+            )
+        )
+        self.assertIn(
+            "#sha256=",
+            dependencies[0],
         )
 
     def test_commands_are_documented(self) -> None:

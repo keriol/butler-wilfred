@@ -8,7 +8,9 @@ version = "0.1.8.dev0"
 description = "Public and extensible Butler runtime"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "butler-core @ https://github.com/keriol/butler-core/releases/download/v0.1.1/butler_core-0.1.1-py3-none-any.whl#sha256=a5e105278ee5fa14de4cfb0d05f5061f50a3a9679a6081a42f0e1b61a82b1f99",
+]
 
 [project.scripts]
 wilfred = "wilfred.__main__:main"
