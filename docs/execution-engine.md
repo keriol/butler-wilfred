@@ -82,10 +82,13 @@ must remain bounded and cooperative.
 
 ## Current boundary
 
-The Execution Engine is infrastructure, not yet a complete autonomous Butler.
+The Execution Engine remains the single-tool execution layer.
 
-Native capabilities, READ-ACTION-VERIFY workflows, persistence, goal APIs,
-Home Assistant integration and the Wilfred `0.2.0` public alpha are still
-under development.
+Provider-agnostic READ-ACTION-VERIFY workflows build on it without
+redefining Execution Engine `success` as proof of external state change.
+See [Verified workflows](verified-workflows.md).
+
+Native capabilities, persistence, goal APIs, Home Assistant integration
+and the Wilfred `0.2.0` public alpha are still under development.
 
 The crowdfunding campaign has not launched.
