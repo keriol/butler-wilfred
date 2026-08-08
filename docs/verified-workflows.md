@@ -55,7 +55,10 @@ It must return `True`, `False` or `None`.
 
 This first workflow is synchronous and intentionally small.
 
-It does not yet provide persistence, retries, delayed verification, recovery
+Persistence is available as a separate optional storage layer. The workflow
+does not persist automatically. See [Workflow persistence](persistence.md).
+
+The workflow does not yet provide retries, delayed verification, recovery
 or Home Assistant-specific behaviour.
 
 Automatic ACTION retries are deliberately outside this contract because
