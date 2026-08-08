@@ -37,7 +37,7 @@ wilfred
 Expected output:
 
 ```json
-{"locale": "en", "log_level": "INFO", "name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.1.8.dev0"}
+{"locale": "en", "log_level": "INFO", "name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.1.8"}
 ```
 
 The same runtime can also be started with:
