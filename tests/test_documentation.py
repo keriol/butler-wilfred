@@ -129,5 +129,37 @@ class WilfredDocumentationTests(unittest.TestCase):
         )
 
 
+
+    def test_persistence_guide_documents_contract(self) -> None:
+        guide = (
+            PROJECT_ROOT
+            / "docs"
+            / "persistence.md"
+        ).read_text(encoding="utf-8")
+
+        normalized = " ".join(guide.split())
+
+        for term in (
+            "WorkflowStore",
+            "SQLiteWorkflowStore",
+            "WorkflowRecord",
+            "WorkflowPersistenceError",
+        ):
+            self.assertIn(term, guide)
+
+        self.assertIn(
+            "Persistence is deliberately separate from workflow execution.",
+            normalized,
+        )
+        self.assertIn(
+            "does not silently overwrite workflow history",
+            normalized,
+        )
+        self.assertIn(
+            "does not persist automatically",
+            normalized,
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

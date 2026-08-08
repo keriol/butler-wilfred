@@ -29,6 +29,12 @@ from wilfred.output import (
     OutputPriority,
     OutputRequest,
 )
+from wilfred.persistence import (
+    SQLiteWorkflowStore,
+    WorkflowPersistenceError,
+    WorkflowRecord,
+    WorkflowStore,
+)
 from wilfred.plugins import (
     PluginDefinition,
     PluginLoadResult,
@@ -71,10 +77,14 @@ __all__ = [
     "ReadActionVerifyResult",
     "ReadActionVerifyWorkflow",
     "RuntimeConfig",
+    "SQLiteWorkflowStore",
     "ToolDefinition",
     "ToolPermission",
     "ToolRegistry",
     "VerificationStatus",
+    "WorkflowPersistenceError",
+    "WorkflowRecord",
+    "WorkflowStore",
     "discover_plugins",
     "load_config",
     "load_plugin",

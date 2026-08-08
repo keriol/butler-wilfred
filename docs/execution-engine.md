@@ -88,7 +88,8 @@ Provider-agnostic READ-ACTION-VERIFY workflows build on it without
 redefining Execution Engine `success` as proof of external state change.
 See [Verified workflows](verified-workflows.md).
 
-Native capabilities, persistence, goal APIs, Home Assistant integration
-and the Wilfred `0.2.0` public alpha are still under development.
+Native capabilities, verified workflows and local workflow persistence are
+available. Goal APIs, Home Assistant integration and the Wilfred `0.2.0`
+public alpha are still under development.
 
 The crowdfunding campaign has not launched.

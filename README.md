@@ -9,6 +9,7 @@ It provides:
 - a deterministic tool registry;
 - a structured Execution Engine with validation, policy and timeouts;
 - provider-agnostic READ-ACTION-VERIFY workflows;
+- local SQLite persistence for completed workflow results;
 - a public plugin contract and loader;
 - a standalone command-line entrypoint;
 - an example read-only plugin;
@@ -57,6 +58,9 @@ permissions, confirmations, timeouts and structured results.
 See [Verified workflows](docs/verified-workflows.md) for
 provider-agnostic READ-ACTION-VERIFY execution and verification.
 
+See [Workflow persistence](docs/persistence.md) for the provider-neutral
+store contract and local SQLite implementation.
+
 ## Current development status
 
 Wilfred currently provides:
@@ -73,7 +77,6 @@ The following capabilities are still under development and are not presented
 as available:
 
 - native Butler capabilities;
-- local persistence;
 - goal-oriented CLI and API;
 - the public Home Assistant adapter;
 - the Wilfred `0.2.0` public alpha.
