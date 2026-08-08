@@ -131,7 +131,6 @@ class WilfredCleanRoomDistributionTests(unittest.TestCase):
                     "-m",
                     "pip",
                     "install",
-                    "--no-deps",
                     "--no-index",
                     str(wheel),
                 ],
@@ -167,6 +166,11 @@ if prefix not in module_path.parents:
 if importlib.util.find_spec("alfred") is not None:
     raise RuntimeError(
         "Alfred is importable in the clean environment."
+    )
+
+if importlib.util.find_spec("butler_core") is None:
+    raise RuntimeError(
+        "Butler Core is missing from the clean environment."
     )
 
 registry = ToolRegistry()
