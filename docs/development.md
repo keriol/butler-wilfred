@@ -32,7 +32,7 @@ public distribution works without another butler repository.
 Wilfred uses the `0.1.x` series for small, verifiable milestones on the path
 to `0.2.0`.
 
-The current stable baseline is `0.1.8`.
+The current development baseline is `0.1.9.dev0`.
 
 Subsequent `0.1.x` versions represent concrete increments in packaging,
 distribution, onboarding and public usability. They are milestones, not a
