@@ -37,7 +37,7 @@ wilfred
 Expected output:
 
 ```json
-{"locale": "en", "log_level": "INFO", "name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.1.0"}
+{"locale": "en", "log_level": "INFO", "name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.1.8"}
 ```
 
 The same runtime can also be started with:
@@ -68,8 +68,9 @@ Wilfred currently provides:
 - a standalone public runtime;
 - autonomous identity and configuration;
 - public tool and plugin contracts;
+- shared tool, registry and execution contracts from Butler Core 0.1.2;
 - deterministic plugin loading;
-- a native Execution Engine;
+- an Execution Engine facade backed by Butler Core;
 - provider-agnostic READ-ACTION-VERIFY workflows;
 - clean-room wheel verification without Alfred or another consumer.
 
@@ -83,18 +84,6 @@ as available:
 
 The crowdfunding campaign will only launch after the `0.2.0` release exists
 and Wilfred can demonstrate useful native behaviour.
-
-## Development
-
-Run the public test suite from the repository root:
-
-```bash
-PYTHONPATH=src python -m unittest discover -s tests -v
-```
-
-The suite includes a clean-room distribution test that builds a wheel,
-installs it into a fresh virtual environment and verifies that Wilfred runs
-without any consumer application or editable source checkout.
 
 ## Public boundary
 
@@ -130,6 +119,10 @@ python3.12 -m venv .venv
 .venv/bin/python -m pip install -e '.[dev]'
 .venv/bin/python -m pytest -q
 ~~~
+
+The suite includes a clean-room distribution test that builds a wheel,
+installs it into a fresh virtual environment and verifies that Wilfred runs
+without any consumer application or editable source checkout.
 
 See the [development guide](docs/development.md) for the complete
 compile, test, and clean-room workflow.

@@ -71,7 +71,7 @@ wilfred
 Expected output:
 
 ```json
-{"locale": "en", "log_level": "INFO", "name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.1.0"}
+{"locale": "en", "log_level": "INFO", "name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.1.8"}
 ```
 
 The module entrypoint is equivalent:
@@ -146,13 +146,13 @@ The example demonstrates the public plugin lifecycle:
 From the repository root:
 
 ```bash
-PYTHONPATH=src python -m unittest discover -s tests -v
+python -m pytest -q
 ```
 
 To run only the distribution isolation test:
 
 ```bash
-PYTHONPATH=src python -m unittest     tests.test_distribution_clean_room     -v
+python -m pytest -q tests/test_distribution_clean_room.py
 ```
 
 The clean-room test:
