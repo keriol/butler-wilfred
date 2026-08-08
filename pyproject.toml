@@ -9,7 +9,7 @@ description = "Public and extensible Butler runtime"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "butler-core @ https://github.com/keriol/butler-core/releases/download/v0.1.1/butler_core-0.1.1-py3-none-any.whl#sha256=a5e105278ee5fa14de4cfb0d05f5061f50a3a9679a6081a42f0e1b61a82b1f99",
+    "butler-core @ https://github.com/keriol/butler-core/releases/download/v0.1.2/butler_core-0.1.2-py3-none-any.whl#sha256=bd515d0317965bb24d98a4dfc26069855b9da33184bafb4829ad91c93d14727d",
 ]
 
 [project.scripts]

@@ -57,8 +57,8 @@ class DevelopmentEnvironmentTests(unittest.TestCase):
             dependencies[0].startswith(
                 "butler-core @ "
                 "https://github.com/keriol/butler-core/"
-                "releases/download/v0.1.1/"
-                "butler_core-0.1.1-py3-none-any.whl"
+                "releases/download/v0.1.2/"
+                "butler_core-0.1.2-py3-none-any.whl"
             )
         )
         self.assertIn(
