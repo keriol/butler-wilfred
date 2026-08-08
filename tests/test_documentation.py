@@ -101,5 +101,33 @@ class WilfredDocumentationTests(unittest.TestCase):
         )
 
 
+
+    def test_verified_workflow_guide_documents_contract(self) -> None:
+        guide = (
+            PROJECT_ROOT
+            / "docs"
+            / "verified-workflows.md"
+        ).read_text(encoding="utf-8")
+
+        normalized = " ".join(guide.split())
+
+        for status in (
+            "verified",
+            "failed",
+            "indeterminate",
+        ):
+            self.assertIn(status, guide)
+
+        self.assertIn(
+            "It does not prove that the requested external "
+            "or physical state was reached.",
+            normalized,
+        )
+        self.assertIn(
+            "Automatic ACTION retries are deliberately outside",
+            normalized,
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

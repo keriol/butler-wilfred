@@ -37,6 +37,12 @@ from wilfred.plugins import (
     load_plugins,
 )
 from wilfred.registry import ToolRegistry
+from wilfred.workflows import (
+    ReadActionVerifyRequest,
+    ReadActionVerifyResult,
+    ReadActionVerifyWorkflow,
+    VerificationStatus,
+)
 
 
 try:
@@ -61,10 +67,14 @@ __all__ = [
     "OutputRequest",
     "PluginDefinition",
     "PluginLoadResult",
+    "ReadActionVerifyRequest",
+    "ReadActionVerifyResult",
+    "ReadActionVerifyWorkflow",
     "RuntimeConfig",
     "ToolDefinition",
     "ToolPermission",
     "ToolRegistry",
+    "VerificationStatus",
     "discover_plugins",
     "load_config",
     "load_plugin",
