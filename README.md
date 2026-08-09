@@ -55,6 +55,9 @@ variables, command-line overrides, validation and precedence.
 See [Execution Engine](docs/execution-engine.md) for argument validation,
 permissions, confirmations, timeouts and structured results.
 
+See [Planned execution](docs/planned-execution.md) for the provider-neutral
+planning-to-execution bridge and its confirmation boundary.
+
 See [Verified workflows](docs/verified-workflows.md) for
 provider-agnostic READ-ACTION-VERIFY execution and verification.
 
@@ -71,6 +74,7 @@ Wilfred currently provides:
 - shared tool, registry and execution contracts from Butler Core 0.1.2;
 - deterministic plugin loading;
 - an Execution Engine facade backed by Butler Core;
+- provider-neutral planned execution backed by Butler Core;
 - provider-agnostic READ-ACTION-VERIFY workflows;
 - clean-room wheel verification without Alfred or another consumer.
 
