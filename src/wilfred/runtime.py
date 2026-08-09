@@ -8,6 +8,11 @@ from butler_core import (
 )
 
 from wilfred.native import register_native_tools
+from wilfred.output import (
+    OutputAdapter,
+    OutputKind,
+    OutputRequest,
+)
 from wilfred.planning import (
     PlannedExecution,
     PlannedExecutionResult,
@@ -31,6 +36,8 @@ class WilfredRuntime:
         model: str | None = None,
         enabled: bool = True,
         policy: ExecutionPolicy | None = None,
+        acknowledgement_adapter: OutputAdapter | None = None,
+        acknowledgement_text: str | None = None,
     ) -> None:
         registry = ToolRegistry()
 
@@ -38,6 +45,8 @@ class WilfredRuntime:
         load_plugins(registry, plugins)
 
         self._registry = registry
+        self._acknowledgement_adapter = acknowledgement_adapter
+        self._acknowledgement_text = acknowledgement_text
         self._planned_execution = PlannedExecution(
             registry,
             provider=provider,
@@ -56,10 +65,31 @@ class WilfredRuntime:
         *,
         confirmed: bool = False,
     ) -> PlannedExecutionResult:
+        self._acknowledge_provider_latency()
+
         return self._planned_execution.execute(
             message,
             confirmed=confirmed,
         )
+
+    def _acknowledge_provider_latency(self) -> None:
+        adapter = self._acknowledgement_adapter
+        text = self._acknowledgement_text
+
+        if adapter is None or text is None:
+            return
+
+        try:
+            adapter.deliver(
+                OutputRequest(
+                    content=text,
+                    kind=OutputKind.SPEECH,
+                )
+            )
+        except Exception:
+            # A best-effort acknowledgement must never block
+            # planning or alter execution authorization.
+            return
 
 
 __all__ = ["WilfredRuntime"]
