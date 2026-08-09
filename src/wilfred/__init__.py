@@ -60,6 +60,8 @@ try:
 except PackageNotFoundError:
     __version__ = "0+unknown"
 
+from wilfred.runtime import WilfredRuntime
+
 __all__ = [
     "ButlerIdentity",
     "ConfigurationError",
@@ -77,6 +79,7 @@ __all__ = [
     "OutputRequest",
     "PlannedExecution",
     "PlannedExecutionResult",
+    "WilfredRuntime",
     "PluginDefinition",
     "PluginLoadResult",
     "ReadActionVerifyRequest",

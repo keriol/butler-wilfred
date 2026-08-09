@@ -58,6 +58,9 @@ permissions, confirmations, timeouts and structured results.
 See [Planned execution](docs/planned-execution.md) for the provider-neutral
 planning-to-execution bridge and its confirmation boundary.
 
+See [Wilfred runtime](docs/runtime.md) for the public goal-oriented
+composition API.
+
 See [Verified workflows](docs/verified-workflows.md) for
 provider-agnostic READ-ACTION-VERIFY execution and verification.
 
@@ -75,6 +78,7 @@ Wilfred currently provides:
 - deterministic plugin loading;
 - an Execution Engine facade backed by Butler Core;
 - provider-neutral planned execution backed by Butler Core;
+- a public goal-oriented `WilfredRuntime` composition API;
 - provider-agnostic READ-ACTION-VERIFY workflows;
 - clean-room wheel verification without Alfred or another consumer.
 
@@ -82,7 +86,7 @@ The following capabilities are still under development and are not presented
 as available:
 
 - native Butler capabilities;
-- goal-oriented CLI and API;
+- goal-oriented CLI;
 - the public Home Assistant adapter;
 - the Wilfred `0.2.0` public alpha.
 
