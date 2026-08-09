@@ -61,6 +61,9 @@ planning-to-execution bridge and its confirmation boundary.
 See [Wilfred runtime](docs/runtime.md) for the public goal-oriented
 composition API.
 
+See [Goal-oriented CLI](docs/goal-cli.md) for natural-language goal
+planning and execution from the command line.
+
 See [Provider latency acknowledgement](docs/provider-latency-acknowledgement.md)
 for optional pre-planning conversational feedback.
 
@@ -85,6 +88,7 @@ Wilfred currently provides:
 - an Execution Engine facade backed by Butler Core;
 - provider-neutral planned execution backed by Butler Core;
 - a public goal-oriented `WilfredRuntime` composition API;
+- a goal-oriented CLI for provider-backed planning and execution;
 - an optional OpenAI BYOK planner provider;
 - provider-agnostic READ-ACTION-VERIFY workflows;
 - clean-room wheel verification without Alfred or another consumer.
@@ -93,7 +97,6 @@ The following capabilities are still under development and are not presented
 as available:
 
 - native Butler capabilities;
-- goal-oriented CLI;
 - the public Home Assistant adapter;
 - the Wilfred `0.2.0` public alpha.
 

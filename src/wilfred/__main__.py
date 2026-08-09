@@ -14,7 +14,12 @@ from wilfred.config import (
     load_config,
 )
 from wilfred.native import register_native_tools
+from wilfred.providers import (
+    OpenAIPlannerProvider,
+    OpenAIProviderConfigurationError,
+)
 from wilfred.registry import ToolRegistry
+from wilfred.runtime import WilfredRuntime
 
 
 def runtime_status(
@@ -75,6 +80,31 @@ def build_parser() -> argparse.ArgumentParser:
         help="List Wilfred native capabilities.",
     )
 
+    goal = commands.add_parser(
+        "goal",
+        help="Plan and execute a goal through a planner provider.",
+    )
+    goal.add_argument(
+        "message",
+        help="Natural-language goal to plan.",
+    )
+    goal.add_argument(
+        "--provider",
+        choices=("openai",),
+        required=True,
+        help="Planner provider.",
+    )
+    goal.add_argument(
+        "--model",
+        required=True,
+        help="Provider model identifier.",
+    )
+    goal.add_argument(
+        "--confirmed",
+        action="store_true",
+        help="Explicitly confirm ACTION execution.",
+    )
+
     return parser
 
 
@@ -110,6 +140,81 @@ def run_native_command(command: str) -> int:
     return 0
 
 
+def run_goal_command(
+    *,
+    message: str,
+    provider_name: str,
+    model: str,
+    confirmed: bool,
+    environ: Mapping[str, str],
+) -> int:
+    if provider_name != "openai":
+        raise ValueError(
+            f"Unsupported planner provider: {provider_name}"
+        )
+
+    provider = OpenAIPlannerProvider.from_environment(
+        model=model,
+        environ=environ,
+    )
+
+    runtime = WilfredRuntime(
+        provider=provider,
+        system_prompt=(
+            "Select the appropriate Wilfred tool for the "
+            "user's goal using only the available tools."
+        ),
+    )
+
+    result = runtime.execute_goal(
+        message,
+        confirmed=confirmed,
+    )
+
+    plan = result.planning.plan
+
+    planning = {
+        "status": result.planning.status.value,
+        "duration_ms": result.planning.duration_ms,
+        "plan": (
+            None
+            if plan is None
+            else {
+                "tool_name": plan.tool_name,
+                "arguments": dict(plan.arguments),
+                "confidence": plan.confidence,
+                "reason": plan.reason,
+            }
+        ),
+        "model": result.planning.model,
+        "error_code": result.planning.error_code,
+        "error_message": result.planning.error_message,
+        "validation_errors": [
+            str(item)
+            for item in result.planning.validation_errors
+        ],
+    }
+
+    payload = {
+        "planning": planning,
+        "execution": (
+            None
+            if result.execution is None
+            else result.execution.to_dict()
+        ),
+    }
+
+    print(
+        json.dumps(
+            payload,
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+    )
+
+    return 0
+
+
 def main(
     argv: Sequence[str] | None = None,
     *,
@@ -118,8 +223,30 @@ def main(
     parser = build_parser()
     arguments = parser.parse_args(argv)
 
-    if arguments.command is not None:
+    if arguments.command in {"status", "tools"}:
         return run_native_command(arguments.command)
+
+    if arguments.command == "goal":
+        effective_environment = (
+            os.environ
+            if environ is None
+            else environ
+        )
+
+        try:
+            return run_goal_command(
+                message=arguments.message,
+                provider_name=arguments.provider,
+                model=arguments.model,
+                confirmed=arguments.confirmed,
+                environ=effective_environment,
+            )
+        except OpenAIProviderConfigurationError as exc:
+            print(
+                f"wilfred: configuration error: {exc}",
+                file=sys.stderr,
+            )
+            return 2
 
     try:
         config = load_config(
