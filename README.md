@@ -61,6 +61,9 @@ planning-to-execution bridge and its confirmation boundary.
 See [Wilfred runtime](docs/runtime.md) for the public goal-oriented
 composition API.
 
+See [OpenAI planner provider](docs/openai-provider.md) for optional BYOK
+planning with an environment-only API key.
+
 See [Verified workflows](docs/verified-workflows.md) for
 provider-agnostic READ-ACTION-VERIFY execution and verification.
 
@@ -79,6 +82,7 @@ Wilfred currently provides:
 - an Execution Engine facade backed by Butler Core;
 - provider-neutral planned execution backed by Butler Core;
 - a public goal-oriented `WilfredRuntime` composition API;
+- an optional OpenAI BYOK planner provider;
 - provider-agnostic READ-ACTION-VERIFY workflows;
 - clean-room wheel verification without Alfred or another consumer.
 

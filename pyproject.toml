@@ -19,6 +19,9 @@ wilfred = "wilfred.__main__:main"
 where = ["src"]
 
 [project.optional-dependencies]
+openai = [
+    "openai>=2.53,<3",
+]
 dev = [
     "pytest>=9,<10",
     "setuptools>=68",
