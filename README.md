@@ -61,6 +61,9 @@ planning-to-execution bridge and its confirmation boundary.
 See [Wilfred runtime](docs/runtime.md) for the public goal-oriented
 composition API.
 
+See [Provider latency acknowledgement](docs/provider-latency-acknowledgement.md)
+for optional pre-planning conversational feedback.
+
 See [OpenAI planner provider](docs/openai-provider.md) for optional BYOK
 planning with an environment-only API key.
 
