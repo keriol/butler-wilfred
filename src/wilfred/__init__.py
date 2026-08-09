@@ -35,6 +35,10 @@ from wilfred.persistence import (
     WorkflowRecord,
     WorkflowStore,
 )
+from wilfred.planning import (
+    PlannedExecution,
+    PlannedExecutionResult,
+)
 from wilfred.plugins import (
     PluginDefinition,
     PluginLoadResult,
@@ -71,6 +75,8 @@ __all__ = [
     "OutputKind",
     "OutputPriority",
     "OutputRequest",
+    "PlannedExecution",
+    "PlannedExecutionResult",
     "PluginDefinition",
     "PluginLoadResult",
     "ReadActionVerifyRequest",
