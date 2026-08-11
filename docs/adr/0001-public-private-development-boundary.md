@@ -1,4 +1,4 @@
-# ADR 0001: Separate Alfred and Wilfred project contexts
+# ADR 0001: Separate public and private development contexts
 
 - Status: Accepted
 - Date: 2026-08-06
@@ -7,19 +7,20 @@
 ## Context
 
 Wilfred is a public distribution built around reusable butler contracts,
-runtime components, tools, workflows, and adapters.
+runtime components, tools, workflows, adapters, and integrations.
 
-Alfred is the private Keriol Home deployment. It contains operational
-configuration, private integrations, household-specific behavior, and details
-that must not leak into Wilfred's public development context.
+Private consumers may combine released Wilfred components with operational
+configuration, deployment-specific integrations, infrastructure, and behaviour
+that does not belong in the public distribution.
 
-Using one undifferentiated AI project context for both systems would create a
-risk of accidental disclosure and would make the public architecture depend on
-private implementation knowledge.
+Using one undifferentiated development context for the public distribution and
+private deployments would create a risk of accidental disclosure and could
+make the public architecture depend on private implementation knowledge.
 
 ## Decision
 
-Alfred and Wilfred use separate AI project contexts.
+The public Wilfred development context and private consumer contexts remain
+separate.
 
 The Wilfred context may contain only information that is safe and useful for
 the public distribution:
@@ -30,12 +31,12 @@ the public distribution:
 - public issues, milestones, release notes, and examples;
 - sanitized acceptance criteria and test evidence.
 
-The Alfred context owns private operational knowledge:
+Private consumer contexts own operational knowledge such as:
 
-- household-specific configuration and entity mappings;
+- deployment-specific configuration and mappings;
 - private services, adapters, endpoints, and infrastructure;
 - secrets, identifiers, personal data, and acquisition mechanisms;
-- deployment procedures and behavior specific to Keriol Home.
+- deployment procedures and consumer-specific behaviour.
 
 Knowledge may cross the boundary only through reviewed, versioned artifacts:
 
@@ -50,46 +51,49 @@ Conversation history is not a synchronization mechanism.
 ## Architectural consequences
 
 Wilfred must remain understandable, testable, and installable without access
-to Alfred's project context.
+to any private consumer context.
 
-Public components must not import private Alfred modules or rely on private
-paths, services, credentials, device identifiers, or household assumptions.
+Public components must not import consumer-specific modules or rely on private
+paths, services, credentials, device identifiers, infrastructure, or household
+assumptions.
 
-Alfred may consume released Wilfred contracts and packages. Private extensions
-remain adapters or plugins owned by Alfred and are not copied into the public
-distribution.
+Private deployments may consume released Wilfred contracts and packages.
+Private extensions remain adapters or plugins owned by their consumer and are
+not copied into the public distribution.
 
-Changes affecting both projects are implemented in this order:
+Changes affecting both public contracts and private consumers are implemented
+in this order:
 
 1. define or update the public contract in Wilfred;
-2. test and version the public behavior;
-3. update Alfred as a consumer;
-4. record private deployment evidence in Alfred's own ledger.
+2. test and version the public behaviour;
+3. update private consumers separately;
+4. record deployment evidence in the private consumer's own development ledger.
 
 ## Review checklist
 
 Before publishing a Wilfred change, verify that:
 
-- the change is useful without Alfred;
+- the change is useful in standalone Wilfred;
 - documentation does not expose private operational details;
 - examples use neutral names and placeholder values;
 - no secret, private endpoint, local path, device ID, or personal data appears;
-- Alfred-specific behavior is represented only as a generic extension point;
+- deployment-specific behaviour is represented only as a generic extension
+  point;
 - compatibility requirements are expressed as public contracts or tests.
 
 ## Rejected alternatives
 
-### One shared project context
+### One shared development context
 
 Rejected because private operational details could influence or enter public
 documentation, examples, tests, or implementation.
 
-### Copying selected conversations between projects
+### Copying selected conversations between contexts
 
 Rejected because conversation fragments are not versioned, reviewable
 interfaces and can silently omit assumptions.
 
-### Making Alfred the reference implementation inside Wilfred
+### Making a private deployment the reference implementation
 
 Rejected because Wilfred must be independently installable and must not depend
-on the private household deployment.
+on any private consumer deployment.

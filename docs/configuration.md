@@ -76,8 +76,9 @@ Configuration is resolved from lowest to highest precedence:
 3. `WILFRED_*` environment variables;
 4. explicit command-line overrides.
 
-Wilfred does not read configuration, credentials, paths or environment
-variables from Alfred or from any other consumer application.
+Wilfred reads only its documented configuration sources and `WILFRED_*`
+environment variables. It does not inherit consumer-specific configuration,
+credentials or paths from another application.
 
 ## Validation
 

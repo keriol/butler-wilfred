@@ -42,7 +42,7 @@ def _run(
 
 
 class WilfredCleanRoomDistributionTests(unittest.TestCase):
-    def test_wheel_runs_without_alfred(self) -> None:
+    def test_wheel_runs_as_standalone_distribution(self) -> None:
         environment = os.environ.copy()
         environment.pop("PYTHONPATH", None)
         environment.pop("PYTHONHOME", None)
@@ -98,13 +98,6 @@ class WilfredCleanRoomDistributionTests(unittest.TestCase):
             ]
 
             self.assertEqual(unexpected, [])
-            self.assertFalse(
-                any(
-                    member.startswith("alfred/")
-                    for member in members
-                )
-            )
-
             _run(
                 [
                     sys.executable,
@@ -161,11 +154,6 @@ prefix = Path(sys.prefix).resolve()
 if prefix not in module_path.parents:
     raise RuntimeError(
         "Wilfred was not loaded from the clean virtualenv."
-    )
-
-if importlib.util.find_spec("alfred") is not None:
-    raise RuntimeError(
-        "Alfred is importable in the clean environment."
     )
 
 if importlib.util.find_spec("butler_core") is None:
