@@ -10,9 +10,11 @@ def test_boundary_adr_is_published() -> None:
     assert ADR.is_file()
 
 
-def test_readme_links_boundary_adr() -> None:
+def test_readme_presents_standalone_public_boundary() -> None:
     text = README.read_text(encoding="utf-8")
-    assert "docs/adr/0001-chatgpt-project-boundary.md" in text
+    assert "standalone public product" in text
+    assert "private consumer deployment" in text
+    assert "Alfred" not in text
 
 
 def test_boundary_defines_separate_ownership() -> None:

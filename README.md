@@ -96,7 +96,7 @@ Wilfred currently provides:
 - an optional FastAPI transport for health, runtime, tools and goals;
 - an optional OpenAI BYOK planner provider;
 - provider-agnostic READ-ACTION-VERIFY workflows;
-- clean-room wheel verification without Alfred or another consumer.
+- clean-room wheel verification as a standalone distribution.
 
 The following capabilities are still under development and are not presented
 as available:
@@ -113,17 +113,12 @@ and Wilfred can demonstrate useful native behaviour.
 This repository contains only generic runtime components, contracts,
 documentation, tests and publishable plugins.
 
+Wilfred is documented and distributed as a standalone public product.
+Public interfaces and user-facing documentation do not assume knowledge of
+any private consumer deployment.
+
 Consumer-specific integrations, infrastructure details, credentials and
 operational configuration belong in separate repositories.
-
-## Project context boundary
-
-Wilfred and the private Alfred deployment use separate AI project contexts.
-Only reviewed, versioned, distribution-safe artifacts cross that boundary.
-
-See
-[ADR 0001: Separate Alfred and Wilfred project contexts](docs/adr/0001-chatgpt-project-boundary.md)
-for the ownership rules and publication checklist.
 
 ## Provider-agnostic output
 
