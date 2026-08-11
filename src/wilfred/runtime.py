@@ -7,7 +7,11 @@ from butler_core import (
     PlannerProvider,
 )
 
-from wilfred.native import register_native_tools
+from wilfred import __version__
+from wilfred.native import (
+    describe_tool,
+    register_native_tools,
+)
 from wilfred.output import (
     OutputAdapter,
     OutputKind,
@@ -58,6 +62,27 @@ class WilfredRuntime:
 
     def tool_names(self) -> list[str]:
         return self._registry.names()
+
+    def describe_runtime(self) -> dict[str, object]:
+        """Return public, credential-free runtime metadata."""
+
+        return {
+            "name": "Wilfred",
+            "status": "ok",
+            "version": __version__,
+            "runtime": "goal-runtime",
+            "tool_count": len(self._registry.names()),
+        }
+
+    def describe_tools(self) -> list[dict[str, object]]:
+        """Return deterministic public tool descriptions."""
+
+        tools = sorted(
+            self._registry.list_tools(),
+            key=lambda item: item.name,
+        )
+
+        return [describe_tool(tool) for tool in tools]
 
     def execute_goal(
         self,

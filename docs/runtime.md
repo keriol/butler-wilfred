@@ -37,13 +37,23 @@ native Wilfred tools.
 
 `tool_names()` exposes the resulting deterministic registry contents.
 
+`describe_runtime()` and `describe_tools()` expose credential-free metadata
+for transports. Tool handlers themselves are never included.
+
+## Transports
+
+The command-line and optional FastAPI transports both delegate goal handling
+to `execute_goal()`. They use the same `PlannedExecutionResult.to_dict()`
+representation, so neither transport duplicates planning, execution or
+confirmation policy.
+
 ## Scope
 
 `WilfredRuntime` does not provide:
 
 - a concrete AI provider;
 - provider credentials or BYOK;
-- a goal CLI command;
+- transport authentication or public-network exposure;
 - Home Assistant integration;
 - background workers, queues, schedulers or retries.
 

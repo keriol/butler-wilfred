@@ -173,6 +173,16 @@ if importlib.util.find_spec("butler_core") is None:
         "Butler Core is missing from the clean environment."
     )
 
+if importlib.util.find_spec("fastapi") is not None:
+    raise RuntimeError(
+        "FastAPI leaked into the base Wilfred installation."
+    )
+
+if importlib.util.find_spec("uvicorn") is not None:
+    raise RuntimeError(
+        "Uvicorn leaked into the base Wilfred installation."
+    )
+
 registry = ToolRegistry()
 plugins = discover_plugins(
     ["wilfred.plugins.demo_echo"]
@@ -298,6 +308,21 @@ print(
             self.assertEqual(
                 status["runtime"],
                 "standalone-bootstrap",
+            )
+
+            api_help = _run(
+                [
+                    str(clean_wilfred),
+                    "api",
+                    "--help",
+                ],
+                cwd=lab,
+                environment=environment,
+            )
+
+            self.assertIn(
+                "optional HTTP API",
+                api_help.stdout,
             )
 
 

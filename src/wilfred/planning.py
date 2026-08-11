@@ -22,6 +22,41 @@ class PlannedExecutionResult:
     planning: PlannerResult
     execution: ExecutionResult | None = None
 
+    def to_dict(self) -> dict[str, object]:
+        """Return the shared CLI and HTTP representation."""
+
+        plan = self.planning.plan
+
+        planning = {
+            "status": self.planning.status.value,
+            "duration_ms": self.planning.duration_ms,
+            "plan": (
+                None
+                if plan is None
+                else {
+                    "tool_name": plan.tool_name,
+                    "arguments": dict(plan.arguments),
+                    "confidence": plan.confidence,
+                    "reason": plan.reason,
+                }
+            ),
+            "model": self.planning.model,
+            "error_code": self.planning.error_code,
+            "error_message": self.planning.error_message,
+            "validation_errors": list(
+                self.planning.validation_errors
+            ),
+        }
+
+        return {
+            "planning": planning,
+            "execution": (
+                None
+                if self.execution is None
+                else self.execution.to_dict()
+            ),
+        }
+
 
 class PlannedExecution:
     """

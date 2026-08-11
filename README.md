@@ -12,6 +12,7 @@ It provides:
 - local SQLite persistence for completed workflow results;
 - a public plugin contract and loader;
 - a standalone command-line entrypoint;
+- an optional FastAPI HTTP transport for the Goal Runtime;
 - an example read-only plugin;
 - standalone identity and runtime configuration;
 - public distribution and clean-room tests.
@@ -64,6 +65,9 @@ composition API.
 See [Goal-oriented CLI](docs/goal-cli.md) for natural-language goal
 planning and execution from the command line.
 
+See [HTTP API](docs/http-api.md) for the optional FastAPI transport,
+loopback-only defaults, structured confirmation flow and security boundary.
+
 See [Provider latency acknowledgement](docs/provider-latency-acknowledgement.md)
 for optional pre-planning conversational feedback.
 
@@ -89,6 +93,7 @@ Wilfred currently provides:
 - provider-neutral planned execution backed by Butler Core;
 - a public goal-oriented `WilfredRuntime` composition API;
 - a goal-oriented CLI for provider-backed planning and execution;
+- an optional FastAPI transport for health, runtime, tools and goals;
 - an optional OpenAI BYOK planner provider;
 - provider-agnostic READ-ACTION-VERIFY workflows;
 - clean-room wheel verification without Alfred or another consumer.

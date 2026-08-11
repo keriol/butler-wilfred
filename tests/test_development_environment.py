@@ -46,8 +46,41 @@ class DevelopmentEnvironmentTests(unittest.TestCase):
 
         self.assertEqual(
             names,
-            {"pytest", "setuptools", "wheel"},
+            {
+                "fastapi",
+                "httpx",
+                "httpx2",
+                "pydantic",
+                "pytest",
+                "setuptools",
+                "uvicorn",
+                "wheel",
+            },
         )
+
+    def test_http_extra_is_optional_and_complete(self) -> None:
+        project = self.load_project()
+        requirements = project[
+            "optional-dependencies"
+        ]["http"]
+
+        names = {
+            requirement_name(item)
+            for item in requirements
+        }
+
+        self.assertEqual(
+            names,
+            {"fastapi", "pydantic", "uvicorn"},
+        )
+
+        runtime_names = {
+            requirement_name(item)
+            for item in project["dependencies"]
+        }
+
+        self.assertNotIn("fastapi", runtime_names)
+        self.assertNotIn("uvicorn", runtime_names)
 
     def test_runtime_dependency_is_butler_core(self) -> None:
         dependencies = self.load_project()["dependencies"]

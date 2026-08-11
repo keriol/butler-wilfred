@@ -35,6 +35,22 @@ def test_runtime_registers_native_tools():
         "wilfred_tools",
     ]
 
+    description = runtime.describe_runtime()
+
+    assert description["name"] == "Wilfred"
+    assert description["status"] == "ok"
+    assert description["runtime"] == "goal-runtime"
+    assert description["tool_count"] == 2
+
+    tools = runtime.describe_tools()
+
+    assert [tool["name"] for tool in tools] == [
+        "wilfred_status",
+        "wilfred_tools",
+    ]
+    assert all("handler" not in tool for tool in tools)
+    assert all("parameters" in tool for tool in tools)
+
 
 def test_runtime_loads_public_plugins():
     from wilfred.runtime import WilfredRuntime
