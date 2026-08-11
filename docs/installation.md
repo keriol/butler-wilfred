@@ -80,6 +80,25 @@ The module entrypoint is equivalent:
 python -m wilfred
 ```
 
+## Optional HTTP API
+
+The base installation does not install an HTTP server. Install Wilfred with
+the `http` extra to add the FastAPI transport and Uvicorn:
+
+```bash
+python -m pip install --no-build-isolation '.[http]'
+```
+
+The HTTP transport needs a configured planner provider. For the optional
+OpenAI provider, install both extras:
+
+```bash
+python -m pip install --no-build-isolation '.[http,openai]'
+```
+
+See [HTTP API](http-api.md) for startup, endpoints, confirmation handling and
+the network security boundary.
+
 ## Verify the public plugin contract
 
 Wilfred includes a harmless read-only example plugin named `demo.echo`.

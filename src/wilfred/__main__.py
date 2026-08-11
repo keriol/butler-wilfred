@@ -22,6 +22,30 @@ from wilfred.registry import ToolRegistry
 from wilfred.runtime import WilfredRuntime
 
 
+DEFAULT_API_HOST = "127.0.0.1"
+DEFAULT_API_PORT = 8000
+
+
+class HTTPAPIConfigurationError(ValueError):
+    """Raised when the optional HTTP runtime cannot start."""
+
+
+def _api_port(value: str) -> int:
+    try:
+        port = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(
+            "port must be an integer"
+        ) from exc
+
+    if not 1 <= port <= 65535:
+        raise argparse.ArgumentTypeError(
+            "port must be between 1 and 65535"
+        )
+
+    return port
+
+
 def runtime_status(
     config: RuntimeConfig | None = None,
 ) -> dict[str, str]:
@@ -105,6 +129,39 @@ def build_parser() -> argparse.ArgumentParser:
         help="Explicitly confirm ACTION execution.",
     )
 
+    api = commands.add_parser(
+        "api",
+        help="Serve the goal runtime through the optional HTTP API.",
+        description=(
+            "Serve the goal runtime through the optional HTTP API."
+        ),
+    )
+    api.add_argument(
+        "--provider",
+        choices=("openai",),
+        required=True,
+        help="Planner provider.",
+    )
+    api.add_argument(
+        "--model",
+        required=True,
+        help="Provider model identifier.",
+    )
+    api.add_argument(
+        "--host",
+        default=DEFAULT_API_HOST,
+        help=(
+            "HTTP bind address. Defaults to the loopback-only "
+            f"address {DEFAULT_API_HOST}."
+        ),
+    )
+    api.add_argument(
+        "--port",
+        type=_api_port,
+        default=DEFAULT_API_PORT,
+        help=f"HTTP port. Defaults to {DEFAULT_API_PORT}.",
+    )
+
     return parser
 
 
@@ -171,46 +228,68 @@ def run_goal_command(
         confirmed=confirmed,
     )
 
-    plan = result.planning.plan
-
-    planning = {
-        "status": result.planning.status.value,
-        "duration_ms": result.planning.duration_ms,
-        "plan": (
-            None
-            if plan is None
-            else {
-                "tool_name": plan.tool_name,
-                "arguments": dict(plan.arguments),
-                "confidence": plan.confidence,
-                "reason": plan.reason,
-            }
-        ),
-        "model": result.planning.model,
-        "error_code": result.planning.error_code,
-        "error_message": result.planning.error_message,
-        "validation_errors": [
-            str(item)
-            for item in result.planning.validation_errors
-        ],
-    }
-
-    payload = {
-        "planning": planning,
-        "execution": (
-            None
-            if result.execution is None
-            else result.execution.to_dict()
-        ),
-    }
-
     print(
         json.dumps(
-            payload,
+            result.to_dict(),
             ensure_ascii=False,
             sort_keys=True,
         )
     )
+
+    return 0
+
+
+def run_api_command(
+    *,
+    provider_name: str,
+    model: str,
+    host: str,
+    port: int,
+    environ: Mapping[str, str],
+) -> int:
+    try:
+        from wilfred.api import (
+            HTTPAPIUnavailableError,
+            serve_api,
+        )
+    except (ImportError, RuntimeError) as exc:
+        raise HTTPAPIConfigurationError(
+            "HTTP API support requires the optional "
+            "'http' dependencies."
+        ) from exc
+
+    if provider_name != "openai":
+        raise ValueError(
+            f"Unsupported planner provider: {provider_name}"
+        )
+
+    provider = OpenAIPlannerProvider.from_environment(
+        model=model,
+        environ=environ,
+    )
+
+    runtime = WilfredRuntime(
+        provider=provider,
+        system_prompt=(
+            "Select the appropriate Wilfred tool for the "
+            "user's goal using only the available tools."
+        ),
+    )
+
+    secret = environ.get(
+        "WILFRED_OPENAI_API_KEY",
+        "",
+    ).strip()
+
+    try:
+        serve_api(
+            runtime,
+            host=host,
+            port=port,
+            sensitive_values=(secret,),
+        )
+    except HTTPAPIUnavailableError as exc:
+        raise HTTPAPIConfigurationError(str(exc)) from exc
 
     return 0
 
@@ -242,6 +321,31 @@ def main(
                 environ=effective_environment,
             )
         except OpenAIProviderConfigurationError as exc:
+            print(
+                f"wilfred: configuration error: {exc}",
+                file=sys.stderr,
+            )
+            return 2
+
+    if arguments.command == "api":
+        effective_environment = (
+            os.environ
+            if environ is None
+            else environ
+        )
+
+        try:
+            return run_api_command(
+                provider_name=arguments.provider,
+                model=arguments.model,
+                host=arguments.host,
+                port=arguments.port,
+                environ=effective_environment,
+            )
+        except (
+            HTTPAPIConfigurationError,
+            OpenAIProviderConfigurationError,
+        ) as exc:
             print(
                 f"wilfred: configuration error: {exc}",
                 file=sys.stderr,

@@ -76,3 +76,8 @@ def test_wilfred_tools_introspects_registry() -> None:
         tool["category"] == "native"
         for tool in tools
     )
+
+    assert all(
+        tool["parameters"]["type"] == "object"
+        for tool in tools
+    )

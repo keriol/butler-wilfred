@@ -21,8 +21,9 @@ Run the complete suite:
 .venv/bin/python -m pytest -q
 ~~~
 
-The `dev` extra contains development and packaging tools only.
-Normal Wilfred installations do not install them.
+The `dev` extra contains development, packaging and HTTP test tools.
+Normal Wilfred installations do not install them. Production HTTP support
+is available separately through the `http` extra.
 
 The suite includes the clean-room wheel test, which verifies that the
 public distribution works without another butler repository.

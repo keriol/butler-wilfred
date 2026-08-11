@@ -19,7 +19,7 @@ def _runtime_status() -> dict[str, str]:
     }
 
 
-def _describe_tool(
+def describe_tool(
     tool: ToolDefinition,
 ) -> dict[str, Any]:
     return {
@@ -27,6 +27,7 @@ def _describe_tool(
         "description": tool.description,
         "category": tool.category,
         "permission": tool.permission.value,
+        "parameters": dict(tool.parameters),
     }
 
 
@@ -59,7 +60,7 @@ def register_native_tools(
 
         return {
             "tools": [
-                _describe_tool(tool)
+                describe_tool(tool)
                 for tool in tools
             ]
         }
@@ -81,3 +82,9 @@ def register_native_tools(
             permission=ToolPermission.READ,
         )
     )
+
+
+__all__ = [
+    "describe_tool",
+    "register_native_tools",
+]

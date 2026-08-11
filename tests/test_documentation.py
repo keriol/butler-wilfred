@@ -32,6 +32,52 @@ class WilfredDocumentationTests(unittest.TestCase):
             ),
             readme,
         )
+        self.assertIn(
+            "docs/http-api.md",
+            readme,
+        )
+
+    def test_http_api_guide_documents_security_contract(self) -> None:
+        guide = (
+            PROJECT_ROOT
+            / "docs"
+            / "http-api.md"
+        ).read_text(encoding="utf-8")
+
+        normalized = " ".join(guide.split())
+
+        for endpoint in (
+            "GET /health",
+            "GET /v1/runtime",
+            "GET /v1/tools",
+            "POST /v1/goals",
+        ):
+            self.assertIn(endpoint, guide)
+
+        self.assertIn(
+            "127.0.0.1",
+            guide,
+        )
+        self.assertIn(
+            "CORS is not enabled",
+            normalized,
+        )
+        self.assertIn(
+            "does not include authentication",
+            normalized,
+        )
+        self.assertIn(
+            "confirmed",
+            guide,
+        )
+        self.assertIn(
+            "confirmation_required",
+            guide,
+        )
+        self.assertNotIn(
+            "allow_origins=[\"*\"]",
+            guide,
+        )
 
     def test_installation_uses_execution_engine(self) -> None:
         installation = (
