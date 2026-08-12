@@ -181,7 +181,7 @@ log_level = "INFO"
                 """
 [identity]
 name = "Wilfred"
-secret_alfred_mode = true
+unsupported_identity_mode = true
 """.strip(),
                 encoding="utf-8",
             )
