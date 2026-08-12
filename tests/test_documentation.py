@@ -37,6 +37,41 @@ class WilfredDocumentationTests(unittest.TestCase):
             readme,
         )
 
+    def test_public_onboarding_documents_first_session(self) -> None:
+        guide = (
+            PROJECT_ROOT
+            / "docs"
+            / "onboarding.md"
+        ).read_text(encoding="utf-8")
+
+        readme = (
+            PROJECT_ROOT
+            / "README.md"
+        ).read_text(encoding="utf-8")
+
+        for term in (
+            "wilfred status",
+            "wilfred tools",
+            "wilfred goal",
+            "wilfred api",
+            "demo.echo",
+            "WILFRED_OPENAI_API_KEY",
+            "127.0.0.1:8000",
+            "0.2.0",
+            "Home Assistant adapter",
+        ):
+            self.assertIn(term, guide)
+
+        self.assertIn(
+            "does not provide authentication",
+            " ".join(guide.split()),
+        )
+
+        self.assertIn(
+            "docs/onboarding.md",
+            readme,
+        )
+
     def test_http_api_guide_documents_security_contract(self) -> None:
         guide = (
             PROJECT_ROOT

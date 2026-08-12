@@ -50,6 +50,10 @@ python -m wilfred
 See [Installation and first run](docs/installation.md) for the complete
 procedure, plugin example and verification commands.
 
+See [Public onboarding](docs/onboarding.md) for the shortest path from a
+clean environment to deterministic verification, optional BYOK planning
+and the optional HTTP transport.
+
 See [Runtime configuration](docs/configuration.md) for TOML, environment
 variables, command-line overrides, validation and precedence.
 
