@@ -8,7 +8,7 @@ version = "0.1.3"
 
 [components.wilfred]
 package = "wilfred-butler"
-version = "0.2.0.dev0"
+version = "0.2.0"
 
 [components.home_assistant]
 package = "wilfred-home-assistant"
