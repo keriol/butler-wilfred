@@ -102,15 +102,19 @@ Wilfred currently provides:
 - provider-agnostic READ-ACTION-VERIFY workflows;
 - clean-room wheel verification as a standalone distribution.
 
-The following capabilities are still under development and are not presented
-as available:
+The `0.2.0.dev0` development line also includes:
+
+- the official public Home Assistant plugin;
+- the reference Docker distribution.
+
+The following capabilities remain under development and are not presented as
+stable releases:
 
 - native Butler capabilities;
-- the public Home Assistant adapter;
-- the Wilfred `0.2.0` public alpha.
+- the Wilfred `0.2.0` Public Alpha.
 
-The crowdfunding campaign will only launch after the `0.2.0` release exists
-and Wilfred can demonstrate useful native behaviour.
+The crowdfunding campaign will only launch after the real `0.2.0` release
+exists and completes its release verification.
 
 ## Public boundary
 
@@ -156,3 +160,11 @@ plugins without embedding integration-specific code into the runtime.
 
 See `docs/docker.md` for the reference Compose deployment and
 `distribution/bom.toml` for the development compatibility snapshot.
+
+
+## Public presence
+
+Public naming, social descriptions, launch copy and visual assets are defined
+in `docs/public-presence.md`.
+
+Social communication remains separate from crowdfunding activation.
