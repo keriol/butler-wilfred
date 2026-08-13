@@ -1,0 +1,132 @@
+name: Wilfred Container
+
+on:
+  push:
+    branches:
+      - main
+      - "feature/**"
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  container:
+    name: Build and verify container
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Verify distribution contracts
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+          python -m compileall -q distribution tests
+          pytest -q tests/test_container_distribution.py
+
+      - name: Build image
+        run: |
+          docker build             --build-arg WILFRED_HOME_ASSISTANT_REF=60882a1efba3c3a248047ff69c8ca83352263da7             --tag wilfred:ci             .
+
+      - name: Prepare public test configuration
+        run: |
+          mkdir -p /tmp/wilfred-container-config
+
+          cp             distribution/home-assistant.example.toml             /tmp/wilfred-container-config/home-assistant.toml
+
+          chmod 755             /tmp/wilfred-container-config
+
+          chmod 644             /tmp/wilfred-container-config/home-assistant.toml
+
+      - name: Start built image
+        run: |
+          docker run             --detach             --name wilfred-container-ci             --publish 127.0.0.1:18038:8000             --read-only             --tmpfs /tmp:rw,noexec,nosuid,size=64m             --cap-drop ALL             --security-opt no-new-privileges:true             --volume /tmp/wilfred-container-config:/config:ro             --env WILFRED_OPENAI_API_KEY=test-key             --env WILFRED_PLUGINS=wilfred_home_assistant.bootstrap:create_plugin_from_environment             --env WILFRED_HOME_ASSISTANT_URL=http://ha.example:8123             --env WILFRED_HOME_ASSISTANT_TOKEN=test-token             --env WILFRED_HOME_ASSISTANT_CONFIG=/config/home-assistant.toml             wilfred:ci             api             --host 0.0.0.0             --port 8000             --provider openai             --model test-model
+
+      - name: Verify built image over HTTP
+        run: |
+          python distribution/verify_runtime.py             http://127.0.0.1:18038
+
+          test "$(
+            docker exec wilfred-container-ci id -u
+          )" != "0"
+
+          ! docker inspect             --format '{{json .Mounts}}'             wilfred-container-ci             | grep -Fq '/var/run/docker.sock'
+
+      - name: Stop built image
+        run: |
+          docker rm -f wilfred-container-ci
+
+      - name: Start temporary registry
+        run: |
+          docker run             --detach             --name wilfred-registry-ci             --publish 127.0.0.1:15038:5000             registry:2
+
+      - name: Push image to temporary registry
+        run: |
+          ORIGINAL_ID="$(
+            docker image inspect               wilfred:ci               --format '{{.Id}}'
+          )"
+
+          echo "ORIGINAL_ID=$ORIGINAL_ID"             >> "$GITHUB_ENV"
+
+          docker tag             wilfred:ci             localhost:15038/wilfred:ci
+
+          docker push             localhost:15038/wilfred:ci
+
+      - name: Remove local image
+        run: |
+          docker image rm             wilfred:ci             localhost:15038/wilfred:ci
+
+          if docker image inspect             localhost:15038/wilfred:ci             >/dev/null 2>&1
+          then
+            echo "Image unexpectedly remains locally."
+            false
+          fi
+
+      - name: Pull image from temporary registry
+        run: |
+          docker pull             localhost:15038/wilfred:ci
+
+          PULLED_ID="$(
+            docker image inspect               localhost:15038/wilfred:ci               --format '{{.Id}}'
+          )"
+
+          echo "Original: $ORIGINAL_ID"
+          echo "Pulled:   $PULLED_ID"
+
+          test "$PULLED_ID" = "$ORIGINAL_ID"
+
+      - name: Start pulled image
+        run: |
+          docker run             --detach             --name wilfred-container-pulled-ci             --publish 127.0.0.1:18039:8000             --read-only             --tmpfs /tmp:rw,noexec,nosuid,size=64m             --cap-drop ALL             --security-opt no-new-privileges:true             --volume /tmp/wilfred-container-config:/config:ro             --env WILFRED_OPENAI_API_KEY=test-key             --env WILFRED_PLUGINS=wilfred_home_assistant.bootstrap:create_plugin_from_environment             --env WILFRED_HOME_ASSISTANT_URL=http://ha.example:8123             --env WILFRED_HOME_ASSISTANT_TOKEN=test-token             --env WILFRED_HOME_ASSISTANT_CONFIG=/config/home-assistant.toml             localhost:15038/wilfred:ci             api             --host 0.0.0.0             --port 8000             --provider openai             --model test-model
+
+      - name: Verify pulled image over HTTP
+        run: |
+          python distribution/verify_runtime.py             http://127.0.0.1:18039
+
+          test "$(
+            docker exec               wilfred-container-pulled-ci               id -u
+          )" != "0"
+
+          ! docker inspect             --format '{{json .Mounts}}'             wilfred-container-pulled-ci             | grep -Fq '/var/run/docker.sock'
+
+      - name: Show logs on failure
+        if: failure()
+        run: |
+          docker logs             wilfred-container-ci             2>/dev/null || true
+
+          docker logs             wilfred-container-pulled-ci             2>/dev/null || true
+
+          docker logs             wilfred-registry-ci             2>/dev/null || true
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker rm -f             wilfred-container-ci             wilfred-container-pulled-ci             wilfred-registry-ci             2>/dev/null || true

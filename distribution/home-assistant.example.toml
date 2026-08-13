@@ -1,0 +1,10 @@
+[targets]
+demo_light = "light.demo"
+
+[actions.turn_on]
+domain = "light"
+service = "turn_on"
+
+[actions.turn_off]
+domain = "light"
+service = "turn_off"

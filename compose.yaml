@@ -1,0 +1,49 @@
+services:
+  wilfred:
+    build:
+      context: .
+      args:
+        WILFRED_HOME_ASSISTANT_REF: "${WILFRED_HOME_ASSISTANT_REF:-60882a1efba3c3a248047ff69c8ca83352263da7}"
+
+    image: "${WILFRED_IMAGE:-wilfred:0.2.0-dev}"
+
+    init: true
+    restart: unless-stopped
+
+    command:
+      - api
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "8000"
+      - --provider
+      - openai
+      - --model
+      - "${WILFRED_MODEL:?Set WILFRED_MODEL in .env}"
+
+    environment:
+      WILFRED_OPENAI_API_KEY: "${WILFRED_OPENAI_API_KEY:?Set WILFRED_OPENAI_API_KEY in .env}"
+      WILFRED_PLUGINS: "wilfred_home_assistant.bootstrap:create_plugin_from_environment"
+      WILFRED_HOME_ASSISTANT_URL: "${WILFRED_HOME_ASSISTANT_URL:?Set WILFRED_HOME_ASSISTANT_URL in .env}"
+      WILFRED_HOME_ASSISTANT_TOKEN: "${WILFRED_HOME_ASSISTANT_TOKEN:?Set WILFRED_HOME_ASSISTANT_TOKEN in .env}"
+      WILFRED_HOME_ASSISTANT_CONFIG: "/config/home-assistant.toml"
+
+    ports:
+      - "${WILFRED_BIND_ADDRESS:-127.0.0.1}:${WILFRED_PORT:-8000}:8000"
+
+    volumes:
+      - "${WILFRED_CONFIG_DIR:-./config}:/config:ro"
+
+    read_only: true
+
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - ALL
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
