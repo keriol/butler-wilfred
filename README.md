@@ -148,3 +148,11 @@ without any consumer application or editable source checkout.
 
 See the [development guide](docs/development.md) for the complete
 compile, test, and clean-room workflow.
+
+## Docker Public Alpha
+
+The standalone Docker distribution composes Wilfred with installed external
+plugins without embedding integration-specific code into the runtime.
+
+See `docs/docker.md` for the reference Compose deployment and
+`distribution/bom.toml` for the development compatibility snapshot.

@@ -10,3 +10,4 @@ venv/
 .mypy_cache/
 .coverage
 htmlcov/
+config/
