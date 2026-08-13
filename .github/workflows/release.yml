@@ -61,10 +61,16 @@ jobs:
 
           test "$PACKAGE_VERSION" = "$VERSION"
 
+          RELEASE_NOTES="docs/releases/${VERSION}.md"
+
+          test -s "$RELEASE_NOTES"
+          grep -Fq "# Wilfred $VERSION" "$RELEASE_NOTES"
+
           git fetch origin main:refs/remotes/origin/main
           git merge-base --is-ancestor HEAD origin/main
 
           echo "RELEASE_VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "RELEASE_NOTES=$RELEASE_NOTES" >> "$GITHUB_ENV"
 
       - name: Install build dependencies
         run: |
@@ -125,4 +131,4 @@ jobs:
             dist/*.tar.gz \
             --verify-tag \
             --title "Wilfred $GITHUB_REF_NAME" \
-            --generate-notes
+            --notes-file "$RELEASE_NOTES"

@@ -31,6 +31,23 @@ def test_release_workflow_guards_release_contract() -> None:
         assert marker in text
 
 
+def test_release_workflow_requires_versioned_public_notes() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+
+    required = [
+        'RELEASE_NOTES="docs/releases/${VERSION}.md"',
+        'test -s "$RELEASE_NOTES"',
+        'grep -Fq "# Wilfred $VERSION" "$RELEASE_NOTES"',
+        'echo "RELEASE_NOTES=$RELEASE_NOTES" >> "$GITHUB_ENV"',
+        '--notes-file "$RELEASE_NOTES"',
+    ]
+
+    for marker in required:
+        assert marker in text
+
+    assert "--generate-notes" not in text
+
+
 def test_release_workflow_has_no_fixed_release_version() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
 

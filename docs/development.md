@@ -83,3 +83,18 @@ Release.
 
 Development versions such as `0.1.7.dev0` therefore cannot be
 published using a stable `v0.1.7` tag.
+
+### Versioned release notes
+
+Every stable release must include a non-empty versioned public release note
+at `docs/releases/<version>.md`.
+
+The release workflow treats this file as part of the release contract:
+
+- its version heading must match the stable package version;
+- the workflow fails before publication if the file is missing or empty;
+- the GitHub Release body is published directly from this file;
+- GitHub-generated notes are not used as the authoritative release summary.
+
+This keeps release notes reviewable, versioned with the source tree and
+identical to the public GitHub Release description.
