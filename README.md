@@ -113,7 +113,7 @@ stable releases:
 - native Butler capabilities;
 - the Wilfred `0.2.0` Public Alpha.
 
-The crowdfunding campaign will only launch after the real `0.2.0` release
+The crowdfunding campaign will only launch after the `0.2.0` release
 exists and completes its release verification.
 
 ## Public boundary
