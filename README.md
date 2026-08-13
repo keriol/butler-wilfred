@@ -23,66 +23,66 @@ It provides:
 - `pip`
 - `venv`
 
-## Quick start
+## Quick Start
 
-From a checked-out copy of this repository:
+### Docker Compose
+
+Docker Compose is the quickest way to run the Wilfred Public Alpha
+with the official Home Assistant plugin.
 
 ```bash
+git clone https://github.com/keriol/butler-wilfred.git
+cd butler-wilfred
+
+mkdir -p config
+cp distribution/home-assistant.example.toml config/home-assistant.toml
+```
+
+Create a `.env` file with the required runtime values:
+
+```dotenv
+WILFRED_MODEL=your-openai-model
+WILFRED_OPENAI_API_KEY=your-api-key
+WILFRED_HOME_ASSISTANT_URL=http://host.docker.internal:8123
+WILFRED_HOME_ASSISTANT_TOKEN=your-long-lived-access-token
+```
+
+Review `config/home-assistant.toml` and replace the demonstration
+targets with values appropriate for your Home Assistant installation.
+
+Then start Wilfred:
+
+```bash
+docker compose up --build -d
+```
+
+Check the runtime:
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+For container configuration, networking and security details, see
+[`docs/docker.md`](docs/docker.md).
+
+### Native Python
+
+For development or direct Python usage, install Wilfred in a Python 3.12
+virtual environment:
+
+```bash
+git clone https://github.com/keriol/butler-wilfred.git
+cd butler-wilfred
+
 python3.12 -m venv .venv
-. .venv/bin/activate
-python -m pip install --upgrade pip setuptools
-python -m pip install --no-build-isolation .
-wilfred
+source .venv/bin/activate
+
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
 ```
 
-Expected output:
-
-```json
-{"locale": "en", "log_level": "INFO", "name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.2.0"}
-```
-
-The same runtime can also be started with:
-
-```bash
-python -m wilfred
-```
-
-See [Installation and first run](docs/installation.md) for the complete
-procedure, plugin example and verification commands.
-
-See [Public onboarding](docs/onboarding.md) for the shortest path from a
-clean environment to deterministic verification, optional BYOK planning
-and the optional HTTP transport.
-
-See [Runtime configuration](docs/configuration.md) for TOML, environment
-variables, command-line overrides, validation and precedence.
-
-See [Execution Engine](docs/execution-engine.md) for argument validation,
-permissions, confirmations, timeouts and structured results.
-
-See [Planned execution](docs/planned-execution.md) for the provider-neutral
-planning-to-execution bridge and its confirmation boundary.
-
-See [Wilfred runtime](docs/runtime.md) for the public goal-oriented
-composition API.
-
-See [Goal-oriented CLI](docs/goal-cli.md) for natural-language goal
-planning and execution from the command line.
-
-See [HTTP API](docs/http-api.md) for the optional FastAPI transport,
-loopback-only defaults, structured confirmation flow and security boundary.
-
-See [Provider latency acknowledgement](docs/provider-latency-acknowledgement.md)
-for optional pre-planning conversational feedback.
-
-See [OpenAI planner provider](docs/openai-provider.md) for optional BYOK
-planning with an environment-only API key.
-
-See [Verified workflows](docs/verified-workflows.md) for
-provider-agnostic READ-ACTION-VERIFY execution and verification.
-
-See [Workflow persistence](docs/persistence.md) for the provider-neutral
-store contract and local SQLite implementation.
+See [`docs/installation.md`](docs/installation.md) and
+[`docs/onboarding.md`](docs/onboarding.md) for the complete native setup.
 
 ## Current development status
 
