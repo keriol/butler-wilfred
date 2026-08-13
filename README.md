@@ -160,14 +160,3 @@ plugins without embedding integration-specific code into the runtime.
 
 See `docs/docker.md` for the reference Compose deployment and
 `distribution/bom.toml` for the development compatibility snapshot.
-
-
-## Public presence
-
-Public naming, LinkedIn communication, Facebook project presence, launch copy
-and visual assets are defined in `docs/public-presence.md`.
-
-GitHub remains the canonical project home. LinkedIn communication uses the
-maintainer's professional profile rather than a Company Page.
-
-Social communication remains separate from crowdfunding activation.
