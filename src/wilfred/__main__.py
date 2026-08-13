@@ -18,6 +18,7 @@ from wilfred.providers import (
     OpenAIPlannerProvider,
     OpenAIProviderConfigurationError,
 )
+from wilfred.plugins import discover_configured_plugins
 from wilfred.registry import ToolRegistry
 from wilfred.runtime import WilfredRuntime
 
@@ -44,6 +45,35 @@ def _api_port(value: str) -> int:
         )
 
     return port
+
+
+
+def _plugin_specs(
+    cli_values: Sequence[str],
+    environ: Mapping[str, str],
+) -> tuple[str, ...]:
+    environment_values = [
+        value.strip()
+        for value in environ.get(
+            "WILFRED_PLUGINS",
+            "",
+        ).split(",")
+        if value.strip()
+    ]
+
+    return tuple(
+        sorted(
+            {
+                value.strip()
+                for value in [
+                    *environment_values,
+                    *cli_values,
+                ]
+                if value.strip()
+            }
+        )
+    )
+
 
 
 def runtime_status(
@@ -124,6 +154,17 @@ def build_parser() -> argparse.ArgumentParser:
         help="Provider model identifier.",
     )
     goal.add_argument(
+        "--plugin",
+        action="append",
+        default=[],
+        metavar="MODULE:FACTORY",
+        help=(
+            "Load a configured plugin factory. "
+            "May be repeated."
+        ),
+    )
+
+    goal.add_argument(
         "--confirmed",
         action="store_true",
         help="Explicitly confirm ACTION execution.",
@@ -136,6 +177,17 @@ def build_parser() -> argparse.ArgumentParser:
             "Serve the goal runtime through the optional HTTP API."
         ),
     )
+    api.add_argument(
+        "--plugin",
+        action="append",
+        default=[],
+        metavar="MODULE:FACTORY",
+        help=(
+            "Load a configured plugin factory. "
+            "May be repeated."
+        ),
+    )
+
     api.add_argument(
         "--provider",
         choices=("openai",),
@@ -203,6 +255,7 @@ def run_goal_command(
     provider_name: str,
     model: str,
     confirmed: bool,
+    plugin_specs: Sequence[str],
     environ: Mapping[str, str],
 ) -> int:
     if provider_name != "openai":
@@ -215,8 +268,14 @@ def run_goal_command(
         environ=environ,
     )
 
+    plugins = discover_configured_plugins(
+        plugin_specs,
+        environ=environ,
+    )
+
     runtime = WilfredRuntime(
         provider=provider,
+        plugins=plugins,
         system_prompt=(
             "Select the appropriate Wilfred tool for the "
             "user's goal using only the available tools."
@@ -245,6 +304,7 @@ def run_api_command(
     model: str,
     host: str,
     port: int,
+    plugin_specs: Sequence[str],
     environ: Mapping[str, str],
 ) -> int:
     try:
@@ -268,8 +328,14 @@ def run_api_command(
         environ=environ,
     )
 
+    plugins = discover_configured_plugins(
+        plugin_specs,
+        environ=environ,
+    )
+
     runtime = WilfredRuntime(
         provider=provider,
+        plugins=plugins,
         system_prompt=(
             "Select the appropriate Wilfred tool for the "
             "user's goal using only the available tools."
@@ -318,6 +384,10 @@ def main(
                 provider_name=arguments.provider,
                 model=arguments.model,
                 confirmed=arguments.confirmed,
+                plugin_specs=_plugin_specs(
+                    arguments.plugin,
+                    effective_environment,
+                ),
                 environ=effective_environment,
             )
         except OpenAIProviderConfigurationError as exc:
@@ -340,6 +410,10 @@ def main(
                 model=arguments.model,
                 host=arguments.host,
                 port=arguments.port,
+                plugin_specs=_plugin_specs(
+                    arguments.plugin,
+                    effective_environment,
+                ),
                 environ=effective_environment,
             )
         except (

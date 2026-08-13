@@ -205,3 +205,33 @@ From the activated virtual environment:
 ```bash
 python -m pip uninstall wilfred-butler
 ```
+
+## Configured external plugins
+
+The standalone goal runtime can load installed plugin factories without adding
+integration-specific code to Wilfred.
+
+A configured plugin factory uses the form:
+
+    package.module:factory
+
+For the official Home Assistant plugin:
+
+    wilfred_home_assistant.bootstrap:create_plugin_from_environment
+
+The factory can be selected explicitly:
+
+    wilfred api \
+      --plugin wilfred_home_assistant.bootstrap:create_plugin_from_environment \
+      --provider openai \
+      --model MODEL
+
+For containerized deployments the same value can be supplied through:
+
+    WILFRED_PLUGINS=wilfred_home_assistant.bootstrap:create_plugin_from_environment
+
+Multiple values in `WILFRED_PLUGINS` are comma-separated.
+
+Plugin factories receive the runtime environment and return a normal
+`PluginDefinition`. They do not bypass Wilfred registration, permissions,
+confirmation policy or execution.

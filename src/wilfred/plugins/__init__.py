@@ -5,6 +5,7 @@ from wilfred.plugins.contracts import (
     PluginLoadResult,
 )
 from wilfred.plugins.loader import (
+    discover_configured_plugins,
     discover_plugins,
     load_plugin,
     load_plugins,
@@ -14,6 +15,7 @@ from wilfred.plugins.loader import (
 __all__ = [
     "PluginDefinition",
     "PluginLoadResult",
+    "discover_configured_plugins",
     "discover_plugins",
     "load_plugin",
     "load_plugins",
