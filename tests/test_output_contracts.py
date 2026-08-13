@@ -1,7 +1,13 @@
 from __future__ import annotations
 
-from pathlib import Path
-import unittest
+from butler_core import (
+    OutputAdapter as CoreOutputAdapter,
+    OutputDeliveryResult as CoreOutputDeliveryResult,
+    OutputDeliveryStatus as CoreOutputDeliveryStatus,
+    OutputKind as CoreOutputKind,
+    OutputPriority as CoreOutputPriority,
+    OutputRequest as CoreOutputRequest,
+)
 
 from wilfred import (
     OutputAdapter,
@@ -15,121 +21,114 @@ from wilfred import (
 
 
 class FakeSpeechAdapter:
-    @property
-    def name(self) -> str:
-        return "fake-speech"
-
-    def capabilities(
+    def __init__(
         self,
-    ) -> frozenset[OutputCapability]:
-        return frozenset({OutputCapability.SPEECH})
+        status: OutputDeliveryStatus = OutputDeliveryStatus.DELIVERED,
+    ) -> None:
+        self.status = status
+        self.requests: list[OutputRequest] = []
+
+    @property
+    def supported_kinds(self) -> frozenset[OutputKind]:
+        return frozenset({OutputKind.SPEECH})
 
     def deliver(
         self,
         request: OutputRequest,
     ) -> OutputDeliveryResult:
-        supported = (
-            request.required_capability
-            in self.capabilities()
-        )
+        self.requests.append(request)
+
+        if request.kind not in self.supported_kinds:
+            return OutputDeliveryResult(
+                status=OutputDeliveryStatus.UNSUPPORTED,
+                error_code="unsupported_kind",
+            )
 
         return OutputDeliveryResult(
-            request_id=request.request_id,
-            adapter_name=self.name,
-            status=(
-                OutputDeliveryStatus.DELIVERED
-                if supported
-                else OutputDeliveryStatus.UNSUPPORTED
-            ),
-            error_code=(
-                None
-                if supported
-                else "unsupported_capability"
-            ),
+            status=self.status,
         )
 
 
-class OutputContractTests(unittest.TestCase):
-    def test_request_defaults(self) -> None:
-        request = OutputRequest(
-            content="Laundry completed.",
+def test_output_contracts_are_butler_core_contracts() -> None:
+    assert OutputAdapter is CoreOutputAdapter
+    assert OutputDeliveryResult is CoreOutputDeliveryResult
+    assert OutputDeliveryStatus is CoreOutputDeliveryStatus
+    assert OutputKind is CoreOutputKind
+    assert OutputPriority is CoreOutputPriority
+    assert OutputRequest is CoreOutputRequest
+
+
+def test_output_capability_is_pre_020_compatibility_alias() -> None:
+    assert OutputCapability is OutputKind
+    assert OutputCapability.SPEECH is OutputKind.SPEECH
+
+
+def test_request_uses_core_delivery_context() -> None:
+    request = OutputRequest(
+        content="Laundry completed.",
+        kind=OutputKind.SPEECH,
+        target="kitchen",
+        correlation_id="job-42",
+    )
+
+    assert request.priority is OutputPriority.NORMAL
+    assert request.target == "kitchen"
+    assert request.correlation_id == "job-42"
+
+
+def test_adapter_uses_supported_kinds() -> None:
+    adapter: OutputAdapter = FakeSpeechAdapter()
+
+    request = OutputRequest(
+        content="Laundry completed.",
+        kind=OutputKind.SPEECH,
+    )
+
+    result = adapter.deliver(request)
+
+    assert result.status is OutputDeliveryStatus.DELIVERED
+    assert result.accepted is True
+    assert result.delivered is True
+    assert result.ok is True
+    assert adapter.requests == [request]
+
+
+def test_accepted_is_not_claimed_as_delivered() -> None:
+    adapter: OutputAdapter = FakeSpeechAdapter(
+        status=OutputDeliveryStatus.ACCEPTED,
+    )
+
+    result = adapter.deliver(
+        OutputRequest(
+            content="Queued.",
             kind=OutputKind.SPEECH,
-            target="kitchen",
         )
+    )
 
-        self.assertTrue(request.request_id)
-        self.assertEqual(
-            request.priority,
-            OutputPriority.NORMAL,
-        )
-        self.assertEqual(
-            request.required_capability,
-            OutputCapability.SPEECH,
-        )
+    assert result.accepted is True
+    assert result.delivered is False
+    assert result.ok is True
 
-    def test_adapter_protocol(self) -> None:
-        self.assertIsInstance(
-            FakeSpeechAdapter(),
-            OutputAdapter,
-        )
 
-    def test_supported_delivery(self) -> None:
-        request = OutputRequest(
-            content="Laundry completed.",
-            kind=OutputKind.SPEECH,
-        )
-        result = FakeSpeechAdapter().deliver(request)
+def test_unsupported_and_failed_are_not_ok() -> None:
+    adapter: OutputAdapter = FakeSpeechAdapter()
 
-        self.assertTrue(result.ok)
-        self.assertEqual(
-            result.status,
-            OutputDeliveryStatus.DELIVERED,
-        )
-
-    def test_unsupported_delivery(self) -> None:
-        request = OutputRequest(
+    unsupported = adapter.deliver(
+        OutputRequest(
             content="Show status.",
             kind=OutputKind.DISPLAY,
         )
-        result = FakeSpeechAdapter().deliver(request)
+    )
 
-        self.assertFalse(result.ok)
-        self.assertEqual(
-            result.status,
-            OutputDeliveryStatus.UNSUPPORTED,
-        )
-        self.assertEqual(
-            result.error_code,
-            "unsupported_capability",
-        )
+    failed = OutputDeliveryResult(
+        status=OutputDeliveryStatus.FAILED,
+        error_code="delivery_failed",
+    )
 
-    def test_failed_delivery_is_not_ok(self) -> None:
-        result = OutputDeliveryResult(
-            request_id="request-1",
-            adapter_name="fake",
-            status=OutputDeliveryStatus.FAILED,
-        )
-
-        self.assertFalse(result.ok)
-
-    def test_contract_is_provider_agnostic(self) -> None:
-        module = (
-            Path(__file__).resolve().parents[1]
-            / "src"
-            / "wilfred"
-            / "output.py"
-        )
-        text = module.read_text(encoding="utf-8").lower()
-
-        for provider in (
-            "alexa",
-            "google home",
-            "home assistant",
-            "echo",
-            "keriol",
-        ):
-            self.assertNotIn(provider, text)
+    assert unsupported.status is OutputDeliveryStatus.UNSUPPORTED
+    assert unsupported.ok is False
+    assert failed.ok is False
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_priority_uses_core_urgent_name() -> None:
+    assert OutputPriority.URGENT.value == "urgent"

@@ -42,8 +42,6 @@ class RecordingSpeechAdapter:
         self.requests.append(request)
 
         return OutputDeliveryResult(
-            request_id=request.request_id,
-            adapter_name=self.name,
             status=self.status,
         )
 

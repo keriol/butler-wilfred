@@ -1,6 +1,12 @@
 from butler_core import (
     ExecutionEngine as CoreExecutionEngine,
     ExecutionRequest as CoreExecutionRequest,
+    OutputAdapter as CoreOutputAdapter,
+    OutputDeliveryResult as CoreOutputDeliveryResult,
+    OutputDeliveryStatus as CoreOutputDeliveryStatus,
+    OutputKind as CoreOutputKind,
+    OutputPriority as CoreOutputPriority,
+    OutputRequest as CoreOutputRequest,
     ToolDefinition as CoreToolDefinition,
     ToolPermission as CoreToolPermission,
     ToolRegistry as CoreToolRegistry,
@@ -30,6 +36,24 @@ def test_execution_is_core_contract() -> None:
     assert ExecutionEngine is CoreExecutionEngine
     assert ExecutionRequest is CoreExecutionRequest
 
+
+
+def test_output_is_core_contract() -> None:
+    from wilfred.output import (
+        OutputAdapter,
+        OutputDeliveryResult,
+        OutputDeliveryStatus,
+        OutputKind,
+        OutputPriority,
+        OutputRequest,
+    )
+
+    assert OutputAdapter is CoreOutputAdapter
+    assert OutputDeliveryResult is CoreOutputDeliveryResult
+    assert OutputDeliveryStatus is CoreOutputDeliveryStatus
+    assert OutputKind is CoreOutputKind
+    assert OutputPriority is CoreOutputPriority
+    assert OutputRequest is CoreOutputRequest
 
 def test_legacy_wilfred_import_path_still_executes() -> None:
     registry = ToolRegistry()
