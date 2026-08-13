@@ -45,7 +45,7 @@ def test_reference_binding_is_loopback_only() -> None:
     )
 
 
-def test_distribution_bom_matches_dev_line() -> None:
+def test_distribution_bom_matches_release_baseline() -> None:
     with (
         ROOT / "distribution" / "bom.toml"
     ).open("rb") as stream:
@@ -58,7 +58,7 @@ def test_distribution_bom_matches_dev_line() -> None:
     )
     assert (
         bom["components"]["wilfred"]["version"]
-        == "0.2.0.dev0"
+        == "0.2.0"
     )
     assert (
         bom["components"]["home_assistant"]["version"]

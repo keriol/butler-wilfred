@@ -38,7 +38,7 @@ wilfred
 Expected output:
 
 ```json
-{"locale": "en", "log_level": "INFO", "name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.2.0.dev0"}
+{"locale": "en", "log_level": "INFO", "name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.2.0"}
 ```
 
 The same runtime can also be started with:
@@ -102,7 +102,7 @@ Wilfred currently provides:
 - provider-agnostic READ-ACTION-VERIFY workflows;
 - clean-room wheel verification as a standalone distribution.
 
-The `0.2.0.dev0` development line also includes:
+The `0.2.0` Public Alpha also includes:
 
 - the official public Home Assistant plugin;
 - the reference Docker distribution.
