@@ -479,10 +479,6 @@ def main() -> int:
     )
 
     specifications = {
-        "linkedin-logo.png":
-            avatar(400, 400),
-        "linkedin-cover.png":
-            cover(4200, 700),
         "facebook-profile.png":
             avatar(320, 320),
         "facebook-cover.png":

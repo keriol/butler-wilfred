@@ -53,31 +53,52 @@ Official Home Assistant plugin:
 Until dedicated social pages are created, GitHub is the canonical public
 project destination.
 
-## Preferred social naming
+## Channel model
 
-Page name:
+GitHub is the canonical public home of the Wilfred project.
 
-    Wilfred
+Facebook may host an official Wilfred project page and community presence.
 
-Preferred handle where available:
+LinkedIn communication is intentionally published through the maintainer's
+personal professional profile rather than through a Company Page.
 
-    wilfred-butler
+Wilfred is an open-source software project, not a company. The project must
+not create or present a LinkedIn Company Page merely to obtain a dedicated
+social identity.
 
-Fallback handle:
-
-    wilfred-runtime
-
-Handle availability must be confirmed on the platform when the page is
-created. A handle must never be documented as canonical before it is actually
-claimed.
+A dedicated LinkedIn organization page may be reconsidered in the future if
+Wilfred becomes an actual organization or LinkedIn provides an appropriate
+project-oriented page type.
 
 ## LinkedIn
 
-### Tagline
+### Presence model
 
-    Extensible Butler runtime for safe, deterministic automation.
+LinkedIn is a professional communication channel for the project, not its
+canonical home.
 
-### Short description
+Wilfred does not maintain a dedicated LinkedIn page or a separate LinkedIn
+publishing identity.
+
+For the Public Alpha launch, the preferred LinkedIn presence is a long-form
+article published from the maintainer's personal professional profile and
+linked directly to the project's canonical GitHub resources.
+
+The article may cover:
+
+- why Wilfred exists;
+- the Butler runtime architecture;
+- deterministic tools and execution boundaries;
+- the Home Assistant plugin;
+- the Docker distribution;
+- engineering lessons from the project;
+- the road to the Public Alpha.
+
+Further LinkedIn activity is optional and remains personal professional
+communication rather than an official project page or mandatory publishing
+schedule.
+
+### Project description
 
 Wilfred is an open-source Butler runtime for deterministic tool execution,
 pluggable capabilities and safe automation orchestration.
@@ -86,7 +107,7 @@ It provides explicit permissions, structured execution, provider-neutral
 planning, verified READ-ACTION-VERIFY workflows, an HTTP Goal Runtime and a
 public plugin contract.
 
-### About
+### Long project description
 
 Wilfred is an open-source, extensible Butler runtime designed to orchestrate
 tools and services without owning the systems behind them.
@@ -99,8 +120,8 @@ policy, while verified workflows can read state before and after an action.
 Wilfred can run standalone, expose an optional HTTP API and load external
 plugins through a public plugin contract.
 
-The 0.2.0 Public Alpha introduces the official Home Assistant plugin and the
-reference Docker distribution.
+The 0.2.0 Public Alpha development line includes the official Home Assistant
+plugin and the reference Docker distribution.
 
 Wilfred is developed publicly on GitHub.
 
@@ -198,7 +219,7 @@ https://github.com/keriol/butler-wilfred
 
 Recommended initial sequence:
 
-1. project introduction;
+1. project introduction on the maintainer's LinkedIn profile and Facebook;
 2. Home Assistant plugin spotlight;
 3. Docker distribution spotlight;
 4. 0.2.0 release announcement after the verified release exists.
@@ -223,12 +244,13 @@ Crowdfunding copy, scope and readiness are tracked separately.
 
 Generated upload assets are stored in `assets/social/`.
 
-Current assets:
+Current platform assets:
 
-- `linkedin-logo.png` — 400 x 400;
-- `linkedin-cover.png` — 4200 x 700;
 - `facebook-profile.png` — 320 x 320;
 - `facebook-cover.png` — 851 x 315.
+
+LinkedIn does not use a dedicated Wilfred page identity. Project posts use the
+maintainer's normal professional profile identity.
 
 The avatar uses the Wilfred `W` network mark.
 

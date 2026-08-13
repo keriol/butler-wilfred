@@ -8,10 +8,6 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 EXPECTED_IMAGES = {
-    "linkedin-logo.png":
-        (400, 400),
-    "linkedin-cover.png":
-        (4200, 700),
     "facebook-profile.png":
         (320, 320),
     "facebook-cover.png":
@@ -58,6 +54,25 @@ def test_public_presence_copy_exists() -> None:
         "wilfred-home-assistant"
         in document
     )
+
+
+
+def test_linkedin_uses_maintainer_presence_not_company_page() -> None:
+    document = (
+        ROOT / "docs" / "public-presence.md"
+    ).read_text(
+        encoding="utf-8"
+    )
+
+    normalized = " ".join(document.split())
+
+    assert "personal professional profile" in normalized
+    assert "not a company" in normalized
+    assert (
+        "must not create or present a LinkedIn Company Page"
+        in normalized
+    )
+    assert "long-form article" in normalized
 
 
 def test_release_post_is_explicitly_gated() -> None:
