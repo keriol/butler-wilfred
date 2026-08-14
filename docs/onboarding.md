@@ -133,11 +133,12 @@ See [HTTP API](http-api.md).
 
 ## 7. Current public-alpha boundary
 
-Wilfred is progressing toward the `0.2.0` public alpha.
+Wilfred `0.2.0` is the current Public Alpha.
 
-The following are not presented as completed public-alpha capabilities yet:
+The Public Alpha includes the standalone runtime, the official Home Assistant
+plugin integration and the reference Docker distribution.
 
-- a public Home Assistant adapter;
+The following remain outside the completed Public Alpha scope:
 - a complete collection of native Butler capabilities;
 - background workers, schedulers or retry infrastructure;
 - multi-tool planning chains.

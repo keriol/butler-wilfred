@@ -84,6 +84,12 @@ python -m pip install -e ".[dev]"
 See [`docs/installation.md`](docs/installation.md) and
 [`docs/onboarding.md`](docs/onboarding.md) for the complete native setup.
 
+See [`docs/execution-engine.md`](docs/execution-engine.md) for validation,
+permissions, confirmations, timeouts and structured execution results.
+
+See [`docs/http-api.md`](docs/http-api.md) for the optional HTTP transport,
+endpoints and security boundary.
+
 ## Current development status
 
 Wilfred currently provides:
@@ -107,14 +113,17 @@ The `0.2.0` Public Alpha also includes:
 - the official public Home Assistant plugin;
 - the reference Docker distribution.
 
-The following capabilities remain under development and are not presented as
-stable releases:
+Wilfred `0.2.0` is the current Public Alpha. Its runtime, APIs and plugin
+contracts may continue to evolve, and compatibility guarantees remain more
+limited than they will be for a stable release.
 
-- native Butler capabilities;
-- the Wilfred `0.2.0` Public Alpha.
+The following capabilities remain under active development:
 
-The crowdfunding campaign will only launch after the `0.2.0` release
-exists and completes its release verification.
+- additional native Butler capabilities;
+- further hardening and compatibility work across the Public Alpha line.
+
+If Wilfred is useful to you and you would like to support its continued
+development, you can [support Wilfred on Ko-fi](https://ko-fi.com/butlerwilfred).
 
 ## Public boundary
 

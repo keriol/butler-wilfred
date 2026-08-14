@@ -26,11 +26,16 @@ class WilfredDocumentationTests(unittest.TestCase):
             readme,
         )
         self.assertIn(
-            (
-                "The crowdfunding campaign will only "
-                "launch after the `0.2.0` release"
-            ),
+            "Wilfred `0.2.0` is the current Public Alpha",
             readme,
+        )
+        self.assertIn(
+            "support Wilfred on Ko-fi",
+            readme,
+        )
+        self.assertNotIn(
+            "crowdfunding campaign will only launch",
+            readme.lower(),
         )
         self.assertIn(
             "docs/http-api.md",
@@ -58,7 +63,7 @@ class WilfredDocumentationTests(unittest.TestCase):
             "WILFRED_OPENAI_API_KEY",
             "127.0.0.1:8000",
             "0.2.0",
-            "Home Assistant adapter",
+            "official Home Assistant",
         ):
             self.assertIn(term, guide)
 
@@ -164,9 +169,19 @@ class WilfredDocumentationTests(unittest.TestCase):
             "cannot forcibly terminate arbitrary Python code",
             guide,
         )
+        normalized = " ".join(guide.split())
+
         self.assertIn(
-            "The crowdfunding campaign has not launched",
-            guide,
+            "Wilfred `0.2.0` Public Alpha",
+            normalized,
+        )
+        self.assertIn(
+            "official Home Assistant plugin",
+            normalized,
+        )
+        self.assertIn(
+            "Public Alpha hardening",
+            normalized,
         )
         self.assertIn(
             "wilfred.plugins.demo_echo",

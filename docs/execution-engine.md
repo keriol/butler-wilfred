@@ -89,7 +89,8 @@ redefining Execution Engine `success` as proof of external state change.
 See [Verified workflows](verified-workflows.md).
 
 Native capabilities, verified workflows and local workflow persistence are
-available. Goal APIs, Home Assistant integration and the Wilfred `0.2.0`
-public alpha are still under development.
+available. Goal APIs, the official Home Assistant plugin and the Wilfred
+`0.2.0` Public Alpha are part of the current public surface.
 
-The crowdfunding campaign has not launched.
+Additional native capabilities and further Public Alpha hardening remain
+under active development.
