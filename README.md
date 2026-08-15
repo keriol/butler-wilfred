@@ -97,7 +97,7 @@ Wilfred currently provides:
 - a standalone public runtime;
 - autonomous identity and configuration;
 - public tool and plugin contracts;
-- shared tool, registry and execution contracts from Butler Core 0.1.3;
+- shared tool, registry, execution and deterministic resolution contracts from Butler Core 0.1.4;
 - deterministic plugin loading;
 - an Execution Engine facade backed by Butler Core;
 - provider-neutral planned execution backed by Butler Core;

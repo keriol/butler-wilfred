@@ -146,3 +146,60 @@ def test_acknowledgement_never_grants_action_confirmation():
         result.execution.status
         is ExecutionStatus.CONFIRMATION_REQUIRED
     )
+
+
+def test_deterministic_resolution_skips_provider_acknowledgement():
+    from butler_core import (
+        PlannerResult,
+        PlannerStatus,
+        ResolutionResult,
+        ResolverDefinition,
+        ToolPlan,
+    )
+
+    events: list[str] = []
+    adapter = RecordingSpeechAdapter(events)
+
+    def provider(message, system_prompt, tools):
+        events.append("provider")
+        raise AssertionError(
+            "provider must not run for deterministic resolution"
+        )
+
+    def resolver(message):
+        return ResolutionResult.handled_result(
+            PlannerResult(
+                status=PlannerStatus.SUCCESS,
+                duration_ms=0.0,
+                plan=ToolPlan(
+                    tool_name="wilfred_status",
+                    arguments={},
+                    confidence=1.0,
+                    reason="deterministic native resolution",
+                ),
+            )
+        )
+
+    runtime = WilfredRuntime(
+        provider=provider,
+        system_prompt="Test runtime.",
+        resolvers=(
+            ResolverDefinition(
+                "native-status",
+                resolver,
+            ),
+        ),
+        acknowledgement_adapter=adapter,
+        acknowledgement_text="Thinking about it.",
+    )
+
+    result = runtime.execute_goal(
+        "what is your status?"
+    )
+
+    assert events == []
+    assert result.execution is not None
+    assert (
+        result.execution.status
+        is ExecutionStatus.SUCCESS
+    )

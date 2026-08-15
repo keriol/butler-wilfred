@@ -5,6 +5,7 @@ from collections.abc import Iterable
 from butler_core import (
     ExecutionPolicy,
     PlannerProvider,
+    ResolverDefinition,
 )
 
 from wilfred import __version__
@@ -40,6 +41,7 @@ class WilfredRuntime:
         model: str | None = None,
         enabled: bool = True,
         policy: ExecutionPolicy | None = None,
+        resolvers: Iterable[ResolverDefinition] = (),
         acknowledgement_adapter: OutputAdapter | None = None,
         acknowledgement_text: str | None = None,
     ) -> None:
@@ -58,6 +60,8 @@ class WilfredRuntime:
             model=model,
             enabled=enabled,
             policy=policy,
+            resolvers=tuple(resolvers),
+            before_fallback=self._acknowledge_provider_latency,
         )
 
     def tool_names(self) -> list[str]:
@@ -90,8 +94,6 @@ class WilfredRuntime:
         *,
         confirmed: bool = False,
     ) -> PlannedExecutionResult:
-        self._acknowledge_provider_latency()
-
         return self._planned_execution.execute(
             message,
             confirmed=confirmed,

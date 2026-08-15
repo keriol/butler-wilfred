@@ -1,15 +1,20 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 
 from butler_core import (
     ButlerPlanner,
+    DeterministicResolutionPipeline,
     ExecutionEngine,
     ExecutionPolicy,
     ExecutionRequest,
     ExecutionResult,
     PlannerProvider,
     PlannerResult,
+    ResolutionResult,
+    ResolutionStatus,
+    ResolverDefinition,
 )
 
 from wilfred.registry import ToolRegistry
@@ -75,6 +80,8 @@ class PlannedExecution:
         model: str | None = None,
         enabled: bool = True,
         policy: ExecutionPolicy | None = None,
+        resolvers: tuple[ResolverDefinition, ...] = (),
+        before_fallback: Callable[[], None] | None = None,
     ) -> None:
         self._planner = ButlerPlanner(
             registry,
@@ -87,6 +94,11 @@ class PlannedExecution:
             registry,
             policy=policy,
         )
+        self._before_fallback = before_fallback
+        self._resolution = DeterministicResolutionPipeline(
+            resolvers,
+            fallback=self._plan_fallback,
+        )
 
     def execute(
         self,
@@ -94,7 +106,29 @@ class PlannedExecution:
         *,
         confirmed: bool = False,
     ) -> PlannedExecutionResult:
-        planning = self._planner.plan(message)
+        resolution = self._resolution.resolve(message)
+
+        if resolution.status is ResolutionStatus.ERROR:
+            raise RuntimeError(
+                "Goal resolution failed"
+                + (
+                    f" [{resolution.error_code}]"
+                    if resolution.error_code
+                    else ""
+                )
+                + (
+                    f": {resolution.error_message}"
+                    if resolution.error_message
+                    else ""
+                )
+            )
+
+        planning = resolution.value
+
+        if not isinstance(planning, PlannerResult):
+            raise RuntimeError(
+                "Goal resolver must produce PlannerResult."
+            )
 
         if not planning.ok:
             return PlannedExecutionResult(
@@ -119,6 +153,22 @@ class PlannedExecution:
         return PlannedExecutionResult(
             planning=planning,
             execution=execution,
+        )
+
+    def _plan_fallback(
+        self,
+        message: object,
+    ) -> ResolutionResult:
+        if not isinstance(message, str):
+            raise TypeError(
+                "Goal resolution requires a string message."
+            )
+
+        if self._before_fallback is not None:
+            self._before_fallback()
+
+        return ResolutionResult.handled_result(
+            self._planner.plan(message)
         )
 
 
