@@ -13,10 +13,16 @@ class WilfredDocumentationTests(unittest.TestCase):
             PROJECT_ROOT / "README.md"
         ).read_text(encoding="utf-8")
 
-        self.assertIn(
-            "structured Execution Engine",
-            readme,
-        )
+        for term in (
+            "Build your Butler, one capability at a time.",
+            "## Capabilities know their domain",
+            "### ✅ Available",
+            "### 🧪 In testing",
+            "### 🧭 Designed to enable",
+            "In testing is not a release promise.",
+            "## What Wilfred 0.2.0 is today",
+        ):
+            self.assertIn(term, readme)
         self.assertIn(
             "docs/execution-engine.md",
             readme,

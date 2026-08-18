@@ -1,10 +1,19 @@
 # Wilfred public onboarding
 
-This is the shortest path from a clean Python environment to a verified
+Wilfred is a runtime for building a Butler from reusable capabilities.
+
+Plugins connect the runtime to domains and services. Wilfred provides the
+common foundations for resolution, execution, policy and verification.
+
+This guide is the shortest path from a clean Python environment to a verified
 standalone Wilfred runtime.
 
 Start with deterministic local behaviour. AI planning and HTTP transport are
-optional capabilities and should be enabled only after the base runtime works.
+optional runtime components and should be enabled only after the base runtime
+works.
+
+For a product-level view of capabilities, domains and maturity, see
+[Wilfred use cases](use-cases.md).
 
 ## 1. Requirements
 

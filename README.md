@@ -1,21 +1,108 @@
-# Wilfred
+# Wilfred 🎩
 
-Wilfred is a public, extensible Butler runtime for deterministic tool
-registration and execution.
+**Build your Butler, one capability at a time.**
 
-It provides:
+Wilfred is an open-source runtime for building a Butler from reusable
+capabilities around the domains and services that matter to you.
 
-- typed tool definitions and permission levels;
-- a deterministic tool registry;
-- a structured Execution Engine with validation, policy and timeouts;
-- provider-agnostic READ-ACTION-VERIFY workflows;
-- local SQLite persistence for completed workflow results;
-- a public plugin contract and loader;
-- a standalone command-line entrypoint;
-- an optional FastAPI HTTP transport for the Goal Runtime;
-- an example read-only plugin;
-- standalone identity and runtime configuration;
-- public distribution and clean-room tests.
+Instead of spreading complex behaviour across scripts, automations, API calls
+and AI prompts, you can give the Butler capabilities with clear domain
+boundaries and a common execution model.
+
+**Integrations connect Wilfred to things.**
+
+**Capabilities teach Wilfred what it can do with them.**
+
+**Goals describe what you want the Butler to achieve.**
+
+Wilfred provides the runtime for resolving, executing and governing those
+capabilities consistently.
+
+## Capabilities know their domain
+
+Wilfred separates a few concepts deliberately:
+
+- an **integration or provider** connects to an external service;
+- a **tool** is a typed operation the runtime can execute;
+- a **capability** represents something the Butler knows how to do;
+- a **domain** groups related knowledge and behaviour;
+- a **goal** describes the outcome the user wants.
+
+Plugins can package the tools and domain behaviour needed to add new
+capabilities without pushing that knowledge into the conversational layer.
+
+The official Home Assistant plugin, for example, connects Wilfred to the
+physical smart-home layer while Home Assistant remains responsible for devices,
+integrations and physical orchestration.
+
+## What could you build?
+
+A media domain could handle discovery and playback while a home capability
+handles the physical environment:
+
+> **Find me something to watch and play it in the living room.**
+
+An appliance domain could eventually use context from other capabilities:
+
+> **Is this a good time to run the washing machine?**
+
+The point is not to create one automation for every possible request. Each
+domain contributes the knowledge it owns.
+
+These examples do not mean that every domain already exists publicly in
+Wilfred 0.2.0.
+
+## Capability maturity
+
+Wilfred uses three maturity labels for public features and capability examples.
+
+### ✅ Available
+
+Public and usable today: the standalone runtime, tool and plugin contracts,
+deterministic resolution, planned execution, execution policy, verified
+workflows, Goal CLI and HTTP surfaces, the official Home Assistant plugin and
+the reference Docker distribution.
+
+### 🧪 In testing
+
+Implemented or actively consolidated in a private real-world Butler deployment,
+but not yet published as reusable Wilfred capabilities.
+
+Current validation areas include richer media behaviour, appliances and
+laundry, and proactive communication.
+
+**In testing is not a release promise.**
+
+### 🧭 Designed to enable
+
+Use cases that fit the capability model but are not presented as implemented
+features, such as energy-aware appliances, EV charging coordination, garden
+domains and other user-built capabilities.
+
+See [Wilfred use cases](docs/use-cases.md) for the detailed maturity boundary
+and examples.
+
+## Deterministic when possible. AI when useful.
+
+Known requests can be resolved deterministically first. More open-ended goals
+can optionally fall back to a planner.
+
+Planning does not bypass execution policy. Permissions, confirmation and
+validation remain runtime responsibilities.
+
+Where an outcome can be observed, Wilfred also supports provider-agnostic
+READ → ACTION → READ → VERIFY workflows.
+
+## What Wilfred 0.2.0 is today
+
+Wilfred 0.2.0 is the Public Alpha foundation for this capability model.
+
+It is not a finished catalogue of domain capabilities, and the current Public
+Alpha does not yet provide generic multi-tool planning chains, background
+workers, schedulers or retry infrastructure.
+
+The runtime and contracts are the public foundation on which those capabilities
+can be built, tested and progressively published.
 
 ## Requirements
 
