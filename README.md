@@ -58,10 +58,10 @@ Wilfred uses three maturity labels for public features and capability examples.
 
 ### ✅ Available
 
-Public and usable today: the standalone runtime, tool and plugin contracts,
-deterministic resolution, planned execution, execution policy, verified
-workflows, Goal CLI and HTTP surfaces, the official Home Assistant plugin and
-the reference Docker distribution.
+Public, documented and usable today.
+
+Wilfred 0.2.0 ships the runtime foundation and official Home Assistant bridge
+described in [Current Public Alpha](#current-public-alpha).
 
 ### 🧪 In testing
 
@@ -92,17 +92,6 @@ validation remain runtime responsibilities.
 
 Where an outcome can be observed, Wilfred also supports provider-agnostic
 READ → ACTION → READ → VERIFY workflows.
-
-## What Wilfred 0.2.0 is today
-
-Wilfred 0.2.0 is the Public Alpha foundation for this capability model.
-
-It is not a finished catalogue of domain capabilities, and the current Public
-Alpha does not yet provide generic multi-tool planning chains, background
-workers, schedulers or retry infrastructure.
-
-The runtime and contracts are the public foundation on which those capabilities
-can be built, tested and progressively published.
 
 ## Requirements
 
@@ -177,9 +166,11 @@ permissions, confirmations, timeouts and structured execution results.
 See [`docs/http-api.md`](docs/http-api.md) for the optional HTTP transport,
 endpoints and security boundary.
 
-## Current development status
+## Current Public Alpha
 
-Wilfred currently provides:
+Wilfred `0.2.0` is the current Public Alpha.
+
+It currently provides:
 
 - a standalone public runtime;
 - autonomous identity and configuration;
@@ -193,21 +184,20 @@ Wilfred currently provides:
 - an optional FastAPI transport for health, runtime, tools and goals;
 - an optional OpenAI BYOK planner provider;
 - provider-agnostic READ-ACTION-VERIFY workflows;
-- clean-room wheel verification as a standalone distribution.
-
-The `0.2.0` Public Alpha also includes:
-
+- clean-room wheel verification as a standalone distribution;
 - the official public Home Assistant plugin;
 - the reference Docker distribution.
 
-Wilfred `0.2.0` is the current Public Alpha. Its runtime, APIs and plugin
-contracts may continue to evolve, and compatibility guarantees remain more
-limited than they will be for a stable release.
+The Public Alpha does not yet provide generic multi-tool planning chains,
+background workers, schedulers or retry infrastructure.
 
-The following capabilities remain under active development:
+Its runtime, APIs and plugin contracts may continue to evolve, and
+compatibility guarantees remain more limited than they will be for a stable
+release.
 
-- additional native Butler capabilities;
-- further hardening and compatibility work across the Public Alpha line.
+See [`docs/execution-engine.md`](docs/execution-engine.md) for execution
+semantics and [`docs/http-api.md`](docs/http-api.md) for the optional HTTP
+transport.
 
 If Wilfred is useful to you and you would like to support its continued
 development, you can [support Wilfred on Ko-fi](https://ko-fi.com/butlerwilfred).
@@ -234,25 +224,6 @@ See
 
 ## Development
 
-Create a Python 3.12 environment and install the development extra:
-
-~~~bash
-python3.12 -m venv .venv
-.venv/bin/python -m pip install -e '.[dev]'
-.venv/bin/python -m pytest -q
-~~~
-
-The suite includes a clean-room distribution test that builds a wheel,
-installs it into a fresh virtual environment and verifies that Wilfred runs
-without any consumer application or editable source checkout.
-
-See the [development guide](docs/development.md) for the complete
-compile, test, and clean-room workflow.
-
-## Docker Public Alpha
-
-The standalone Docker distribution composes Wilfred with installed external
-plugins without embedding integration-specific code into the runtime.
-
-See `docs/docker.md` for the reference Compose deployment and
-`distribution/bom.toml` for the development compatibility snapshot.
+For contributor setup, compilation, the complete test suite and clean-room
+distribution verification, see the
+[development guide](docs/development.md).

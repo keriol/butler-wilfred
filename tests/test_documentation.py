@@ -20,16 +20,34 @@ class WilfredDocumentationTests(unittest.TestCase):
             "### 🧪 In testing",
             "### 🧭 Designed to enable",
             "In testing is not a release promise.",
-            "## What Wilfred 0.2.0 is today",
+            "## Current Public Alpha",
         ):
             self.assertIn(term, readme)
         self.assertIn(
             "docs/execution-engine.md",
             readme,
         )
-        self.assertIn(
+        self.assertNotIn(
+            "## What Wilfred 0.2.0 is today",
+            readme,
+        )
+        self.assertNotIn(
             "## Current development status",
             readme,
+        )
+        self.assertNotIn(
+            "## Docker Public Alpha",
+            readme,
+        )
+
+        h2_headings = [
+            line
+            for line in readme.splitlines()
+            if line.startswith("## ")
+        ]
+        self.assertEqual(
+            len(h2_headings),
+            len(set(h2_headings)),
         )
         self.assertIn(
             "Wilfred `0.2.0` is the current Public Alpha",
