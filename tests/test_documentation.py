@@ -50,7 +50,7 @@ class WilfredDocumentationTests(unittest.TestCase):
             len(set(h2_headings)),
         )
         self.assertIn(
-            "Wilfred `0.2.0` is the current Public Alpha",
+            "Wilfred `0.2.1` is the current Public Alpha",
             readme,
         )
         self.assertIn(
@@ -86,7 +86,7 @@ class WilfredDocumentationTests(unittest.TestCase):
             "demo.echo",
             "WILFRED_OPENAI_API_KEY",
             "127.0.0.1:8000",
-            "0.2.0",
+            "0.2.1",
             "official Home Assistant",
         ):
             self.assertIn(term, guide)
@@ -196,7 +196,7 @@ class WilfredDocumentationTests(unittest.TestCase):
         normalized = " ".join(guide.split())
 
         self.assertIn(
-            "Wilfred `0.2.0` Public Alpha",
+            "Wilfred `0.2.1` Public Alpha",
             normalized,
         )
         self.assertIn(

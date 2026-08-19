@@ -28,19 +28,15 @@ is available separately through the `http` extra.
 The suite includes the clean-room wheel test, which verifies that the
 public distribution works without another butler repository.
 
-## Versioning toward 0.2.0
+## Versioning and public checkpoints
 
-Wilfred uses the `0.1.x` series for small, verifiable milestones on the path
-to `0.2.0`.
+Wilfred `0.2.0` established the Public Alpha baseline.
 
-The current release baseline is `0.2.0`.
+The current release baseline is `0.2.1`.
 
-Subsequent `0.1.x` versions represent concrete increments in packaging,
-distribution, onboarding and public usability. They are milestones, not a
-literal percentage-complete scale.
-
-`0.2.0` remains the target for the first sufficiently installable and
-verified public release milestone.
+Development versions are working lines, not release promises. A new public
+version is opened or released only when accumulated coherent value justifies
+another public checkpoint.
 
 ## Native capabilities
 

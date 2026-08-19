@@ -54,11 +54,11 @@ def test_distribution_bom_matches_release_baseline() -> None:
     assert bom["schema_version"] == 1
     assert (
         bom["components"]["butler_core"]["version"]
-        == "0.1.3"
+        == "0.1.4"
     )
     assert (
         bom["components"]["wilfred"]["version"]
-        == "0.2.0"
+        == "0.2.1"
     )
     assert (
         bom["components"]["home_assistant"]["version"]

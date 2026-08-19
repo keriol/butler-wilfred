@@ -168,7 +168,7 @@ endpoints and security boundary.
 
 ## Current Public Alpha
 
-Wilfred `0.2.0` is the current Public Alpha.
+Wilfred `0.2.1` is the current Public Alpha.
 
 It currently provides:
 

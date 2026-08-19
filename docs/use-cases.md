@@ -20,7 +20,7 @@ use, and what the capability model is designed to enable.
 
 ## ✅ Available
 
-These foundations are public in Wilfred 0.2.0.
+These foundations are public in Wilfred 0.2.1.
 
 ### Home Assistant connectivity
 
@@ -182,7 +182,7 @@ The useful question becomes:
 
 ## Public Alpha boundary
 
-Wilfred 0.2.0 provides the public runtime foundations for this model.
+Wilfred 0.2.1 provides the public runtime foundations for this model.
 
 It does not yet provide a complete catalogue of domain capabilities.
 

@@ -90,7 +90,7 @@ See [Verified workflows](verified-workflows.md).
 
 Native capabilities, verified workflows and local workflow persistence are
 available. Goal APIs, the official Home Assistant plugin and the Wilfred
-`0.2.0` Public Alpha are part of the current public surface.
+`0.2.1` Public Alpha are part of the current public surface.
 
 Additional native capabilities and further Public Alpha hardening remain
 under active development.

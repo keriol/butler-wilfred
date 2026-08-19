@@ -71,7 +71,7 @@ wilfred
 Expected output:
 
 ```json
-{"locale": "en", "log_level": "INFO", "name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.2.0"}
+{"locale": "en", "log_level": "INFO", "name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.2.1"}
 ```
 
 The module entrypoint is equivalent:

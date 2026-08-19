@@ -142,7 +142,7 @@ See [HTTP API](http-api.md).
 
 ## 7. Current public-alpha boundary
 
-Wilfred `0.2.0` is the current Public Alpha.
+Wilfred `0.2.1` is the current Public Alpha.
 
 The Public Alpha includes the standalone runtime, the official Home Assistant
 plugin integration and the reference Docker distribution.
