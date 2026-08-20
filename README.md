@@ -222,6 +222,18 @@ display output without depending on a physical provider.
 See
 [ADR 0002: Provider-agnostic output contracts](docs/adr/0002-provider-agnostic-output.md).
 
+## AI developer model
+
+Wilfred includes a **public AI model for developers** who use coding assistants
+or other AI tooling while working on the project.
+
+[`docs/ai-developer-model.md`](docs/ai-developer-model.md) provides a compact
+repository-safe description of the current architecture, execution rules,
+public boundaries and authoritative development sources.
+
+Active work and task status remain in GitHub Issues; the model is intentionally
+not a roadmap or task ledger.
+
 ## Development
 
 For contributor setup, compilation, the complete test suite and clean-room
