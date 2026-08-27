@@ -52,6 +52,7 @@ class DevelopmentEnvironmentTests(unittest.TestCase):
                 "httpx2",
                 "pydantic",
                 "pytest",
+                "pytest-cov",
                 "setuptools",
                 "uvicorn",
                 "wheel",
