@@ -41,9 +41,17 @@ jobs:
         run: |
           python -m compileall -q src tests
 
-      - name: Run test suite
+      - name: Run test suite with coverage
         run: |
-          pytest -q
+          pytest -q --cov=wilfred --cov-report=term-missing --cov-report=xml:coverage.xml
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v7
+        with:
+          name: wilfred-coverage-${{ github.sha }}
+          path: coverage.xml
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Build package
         run: |
