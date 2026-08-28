@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import pytest
 
-from wilfred import CapabilityDefinition, DomainDefinition
-from wilfred.capability_registry import CapabilityRegistry
+from wilfred import (
+    CapabilityDefinition,
+    CapabilityRegistry,
+    DomainDefinition,
+)
 from wilfred.plugins import PluginDefinition
 
 
@@ -85,24 +88,6 @@ def test_registry_rejects_duplicate_domain_identity():
     second = _plugin(
         "plugin.second",
         domains=[DomainDefinition(name="media")],
-    )
-
-    with pytest.raises(ValueError, match="Duplicate domain identities: media"):
-        CapabilityRegistry.from_plugins([first, second])
-
-
-def test_registry_rejects_duplicate_capability_identity():
-    domain = DomainDefinition(name="media")
-    capability = CapabilityDefinition(name="playback", domain="media")
-    first = _plugin(
-        "plugin.first",
-        domains=[domain],
-        capabilities=[capability],
-    )
-    second = _plugin(
-        "plugin.second",
-        domains=[domain],
-        capabilities=[capability],
     )
 
     with pytest.raises(ValueError, match="Duplicate domain identities: media"):
