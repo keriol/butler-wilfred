@@ -5,6 +5,10 @@ from importlib.metadata import (
     version as package_version,
 )
 
+from wilfred.capabilities import (
+    CapabilityDefinition,
+    DomainDefinition,
+)
 from wilfred.config import (
     ButlerIdentity,
     ConfigurationError,
@@ -64,7 +68,9 @@ from wilfred.runtime import WilfredRuntime
 
 __all__ = [
     "ButlerIdentity",
+    "CapabilityDefinition",
     "ConfigurationError",
+    "DomainDefinition",
     "ExecutionEngine",
     "ExecutionPolicy",
     "ExecutionRequest",
