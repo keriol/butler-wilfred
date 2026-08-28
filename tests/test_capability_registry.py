@@ -90,7 +90,10 @@ def test_registry_rejects_duplicate_domain_identity():
         domains=[DomainDefinition(name="media")],
     )
 
-    with pytest.raises(ValueError, match="Duplicate domain identities: media"):
+    with pytest.raises(
+        ValueError,
+        match="Duplicate domain identity 'media'.*'plugin.first'.*'plugin.second'",
+    ):
         CapabilityRegistry.from_plugins([first, second])
 
 
