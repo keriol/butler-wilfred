@@ -8,6 +8,7 @@ from wilfred.capabilities import (
     CapabilityDefinition,
     DomainDefinition,
 )
+from wilfred.verification import GoalExpectation
 
 
 if TYPE_CHECKING:
@@ -29,6 +30,7 @@ class PluginDefinition:
     version: str = "0.1.0"
     domains: tuple[DomainDefinition, ...] = ()
     capabilities: tuple[CapabilityDefinition, ...] = ()
+    verification: tuple[GoalExpectation, ...] = ()
 
     def __post_init__(self) -> None:
         if _PLUGIN_NAME_PATTERN.fullmatch(self.name) is None:
@@ -49,6 +51,7 @@ class PluginDefinition:
 
         domains = tuple(self.domains)
         capabilities = tuple(self.capabilities)
+        verification = tuple(self.verification)
 
         if not all(
             isinstance(domain, DomainDefinition)
@@ -64,6 +67,14 @@ class PluginDefinition:
         ):
             raise TypeError(
                 "Plugin capabilities must contain CapabilityDefinition values."
+            )
+
+        if not all(
+            isinstance(expectation, GoalExpectation)
+            for expectation in verification
+        ):
+            raise TypeError(
+                "Plugin verification must contain GoalExpectation values."
             )
 
         domain_names = [domain.identity for domain in domains]
@@ -95,7 +106,24 @@ class PluginDefinition:
                 f"{', '.join(duplicate_capabilities)}"
             )
 
+        verification_names = [
+            expectation.identity
+            for expectation in verification
+        ]
+        duplicate_verification = sorted(
+            name
+            for name in set(verification_names)
+            if verification_names.count(name) > 1
+        )
+
+        if duplicate_verification:
+            raise ValueError(
+                f"Plugin {self.name!r} declares duplicate verification expectations: "
+                f"{', '.join(duplicate_verification)}"
+            )
+
         owned_domains = set(domain_names)
+        owned_capabilities = set(capability_names)
 
         for capability in capabilities:
             if capability.domain not in owned_domains:
@@ -103,6 +131,14 @@ class PluginDefinition:
                     f"Plugin {self.name!r} capability "
                     f"{capability.identity!r} references undeclared domain "
                     f"{capability.domain!r}."
+                )
+
+        for expectation in verification:
+            if expectation.capability not in owned_capabilities:
+                raise ValueError(
+                    f"Plugin {self.name!r} verification expectation "
+                    f"{expectation.identity!r} references undeclared capability "
+                    f"{expectation.capability!r}."
                 )
 
         object.__setattr__(
@@ -117,6 +153,16 @@ class PluginDefinition:
                 sorted(
                     capabilities,
                     key=lambda capability: capability.identity,
+                )
+            ),
+        )
+        object.__setattr__(
+            self,
+            "verification",
+            tuple(
+                sorted(
+                    verification,
+                    key=lambda expectation: expectation.identity,
                 )
             ),
         )
