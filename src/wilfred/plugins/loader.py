@@ -52,7 +52,6 @@ def discover_plugins(
     )
 
 
-
 def _configured_plugin_from_spec(
     spec: str,
     *,
@@ -143,6 +142,35 @@ def discover_configured_plugins(
     )
 
 
+def _validate_semantic_ownership(
+    plugins: Iterable[PluginDefinition],
+) -> None:
+    domain_owners: dict[str, str] = {}
+    capability_owners: dict[str, str] = {}
+
+    for plugin in plugins:
+        for domain in plugin.domains:
+            previous = domain_owners.get(domain.identity)
+
+            if previous is not None:
+                raise ValueError(
+                    f"Duplicate domain identity {domain.identity!r} "
+                    f"declared by plugins {previous!r} and {plugin.name!r}."
+                )
+
+            domain_owners[domain.identity] = plugin.name
+
+        for capability in plugin.capabilities:
+            previous = capability_owners.get(capability.identity)
+
+            if previous is not None:
+                raise ValueError(
+                    f"Duplicate capability identity {capability.identity!r} "
+                    f"declared by plugins {previous!r} and {plugin.name!r}."
+                )
+
+            capability_owners[capability.identity] = plugin.name
+
 
 def load_plugin(
     registry: ToolRegistry,
@@ -177,6 +205,14 @@ def load_plugin(
     return PluginLoadResult(
         plugin_name=plugin.name,
         tool_names=tool_names,
+        domain_names=tuple(
+            domain.identity
+            for domain in plugin.domains
+        ),
+        capability_names=tuple(
+            capability.identity
+            for capability in plugin.capabilities
+        ),
     )
 
 
@@ -201,6 +237,8 @@ def load_plugins(
             "Duplicate plugin names: "
             f"{', '.join(duplicates)}"
         )
+
+    _validate_semantic_ownership(ordered)
 
     return tuple(
         load_plugin(registry, plugin)
