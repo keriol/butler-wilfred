@@ -73,17 +73,36 @@ When multiple plugins are loaded together, Wilfred validates semantic ownership 
 
 `PluginLoadResult` reports the deterministic `domain_names` and `capability_names` contributed by each loaded plugin in addition to its registered `tool_names`.
 
+## Runtime introspection
+
+`CapabilityRegistry` composes the semantic declarations from loaded plugins into a deterministic queryable view. It is separate from `ToolRegistry`: the tool registry remains the owner of executable operations, while the capability registry owns only semantic metadata and plugin ownership.
+
+`WilfredRuntime` exposes this view directly:
+
+```python
+runtime.domain_names()
+runtime.capability_names()
+runtime.describe_domains()
+runtime.describe_capabilities()
+```
+
+Descriptions contain only public semantic metadata: identity, description, domain relationship and owning plugin. They do not expose credentials, provider payloads or executable handlers.
+
+`describe_runtime()` also reports `domain_count` and `capability_count` alongside `tool_count`.
+
+Semantic conflicts use the same `CapabilityRegistry` validation path during plugin loading, so ownership validation is not implemented separately by the loader and runtime.
+
 ## Compatibility
 
 Existing tool-only plugins remain valid. `domains` and `capabilities` default to empty tuples, so current plugin factories and current `WilfredRuntime` construction do not need to change merely to keep working.
 
 A plugin that declares capabilities opts into the semantic ownership contract. It must also declare the corresponding domains it owns.
 
-Runtime-wide capability discovery and capability-owned deterministic resolver composition are separate follow-up layers. They should consume these declarations rather than create parallel semantic registries.
+Capability-owned deterministic resolver composition remains a separate follow-up layer. It should consume this registry rather than create another semantic ownership model.
 
 ## Ownership boundary
 
-The contracts intentionally do not introduce another registry into Butler Core or Wilfred.
+The semantic registry belongs to Wilfred and does not duplicate the executable tool registry or introduce capability/domain concepts into Butler Core.
 
 The current separation remains:
 
@@ -94,4 +113,4 @@ The current separation remains:
 - tool: typed executable operation;
 - goal: requested outcome.
 
-Butler Core remains provider-neutral and continues to own generic execution and resolution foundations. Wilfred owns the semantic capability/domain model and plugin-level declaration rules.
+Butler Core remains provider-neutral and continues to own generic execution and resolution foundations. Wilfred owns the semantic capability/domain model, registry and plugin-level declaration rules.

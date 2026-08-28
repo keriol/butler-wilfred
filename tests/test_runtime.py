@@ -4,6 +4,7 @@ import json
 
 from butler_core import ExecutionStatus, PlannerStatus
 
+from wilfred import CapabilityDefinition, DomainDefinition
 from wilfred.models import ToolDefinition, ToolPermission
 from wilfred.plugins import PluginDefinition
 
@@ -41,6 +42,8 @@ def test_runtime_registers_native_tools():
     assert description["status"] == "ok"
     assert description["runtime"] == "goal-runtime"
     assert description["tool_count"] == 2
+    assert description["domain_count"] == 0
+    assert description["capability_count"] == 0
 
     tools = runtime.describe_tools()
 
@@ -85,6 +88,62 @@ def test_runtime_loads_public_plugins():
     assert result.execution is not None
     assert result.execution.status is ExecutionStatus.SUCCESS
     assert result.execution.value == {"value": 42}
+
+
+def test_runtime_exposes_loaded_domains_and_capabilities():
+    from wilfred.runtime import WilfredRuntime
+
+    plugin = PluginDefinition(
+        name="test.media",
+        register=lambda registry: registry.register(
+            ToolDefinition(
+                name="test_playback",
+                description="Play a test item.",
+                handler=lambda: {"playing": True},
+            )
+        ),
+        domains=(
+            DomainDefinition(
+                name="media",
+                description="Media knowledge and behavior.",
+            ),
+        ),
+        capabilities=(
+            CapabilityDefinition(
+                name="playback",
+                domain="media",
+                description="Play resolved media.",
+            ),
+        ),
+    )
+
+    runtime = WilfredRuntime(
+        provider=_provider("test_playback"),
+        system_prompt="Test Wilfred runtime.",
+        plugins=[plugin],
+    )
+
+    assert runtime.domain_names() == ["media"]
+    assert runtime.capability_names() == ["media.playback"]
+    assert runtime.describe_domains() == [
+        {
+            "name": "media",
+            "description": "Media knowledge and behavior.",
+            "owner_plugin": "test.media",
+        }
+    ]
+    assert runtime.describe_capabilities() == [
+        {
+            "name": "media.playback",
+            "domain": "media",
+            "description": "Play resolved media.",
+            "owner_plugin": "test.media",
+        }
+    ]
+
+    description = runtime.describe_runtime()
+    assert description["domain_count"] == 1
+    assert description["capability_count"] == 1
 
 
 def test_runtime_executes_native_goal():
