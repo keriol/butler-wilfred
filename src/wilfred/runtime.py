@@ -49,6 +49,9 @@ class WilfredRuntime:
         registry = ToolRegistry()
         loaded_plugins = tuple(plugins)
         capability_registry = CapabilityRegistry.from_plugins(loaded_plugins)
+        legacy_resolvers = tuple(resolvers)
+        capability_resolvers = capability_registry.resolver_definitions()
+        composed_resolvers = legacy_resolvers + capability_resolvers
 
         register_native_tools(registry)
         load_plugins(registry, loaded_plugins)
@@ -64,7 +67,7 @@ class WilfredRuntime:
             model=model,
             enabled=enabled,
             policy=policy,
-            resolvers=tuple(resolvers),
+            resolvers=composed_resolvers,
             before_fallback=self._acknowledge_provider_latency,
         )
 

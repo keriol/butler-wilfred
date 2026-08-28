@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Iterable
 
+from butler_core import ResolverDefinition
+
 from wilfred.capabilities import CapabilityDefinition, DomainDefinition
 
 
@@ -28,6 +30,7 @@ class CapabilityRegistry:
     def __init__(self) -> None:
         self._domains: dict[str, DomainRegistration] = {}
         self._capabilities: dict[str, CapabilityRegistration] = {}
+        self._resolver_owners: dict[str, str] = {}
 
     def register_plugin(self, plugin: PluginDefinition) -> None:
         for domain in plugin.domains:
@@ -40,6 +43,8 @@ class CapabilityRegistry:
                     f"and {plugin.name!r}."
                 )
 
+        pending_resolver_owners = dict(self._resolver_owners)
+
         for capability in plugin.capabilities:
             previous = self._capabilities.get(capability.identity)
 
@@ -49,6 +54,18 @@ class CapabilityRegistry:
                     f"declared by plugins {previous.owner_plugin!r} "
                     f"and {plugin.name!r}."
                 )
+
+            for resolver in capability.resolvers:
+                previous_capability = pending_resolver_owners.get(resolver.name)
+
+                if previous_capability is not None:
+                    raise ValueError(
+                        f"Duplicate resolver name {resolver.name!r} "
+                        f"owned by capabilities {previous_capability!r} "
+                        f"and {capability.identity!r}."
+                    )
+
+                pending_resolver_owners[resolver.name] = capability.identity
 
         for domain in plugin.domains:
             self._domains[domain.identity] = DomainRegistration(
@@ -61,6 +78,8 @@ class CapabilityRegistry:
                 definition=capability,
                 owner_plugin=plugin.name,
             )
+            for resolver in capability.resolvers:
+                self._resolver_owners[resolver.name] = capability.identity
 
     @classmethod
     def from_plugins(
@@ -77,6 +96,14 @@ class CapabilityRegistry:
 
     def capability_names(self) -> list[str]:
         return sorted(self._capabilities)
+
+    def resolver_definitions(self) -> tuple[ResolverDefinition, ...]:
+        """Compose capability-owned resolvers in deterministic order."""
+
+        resolvers: list[ResolverDefinition] = []
+        for _, registration in sorted(self._capabilities.items()):
+            resolvers.extend(registration.definition.resolvers)
+        return tuple(resolvers)
 
     def describe_domains(self) -> list[dict[str, str]]:
         return [
