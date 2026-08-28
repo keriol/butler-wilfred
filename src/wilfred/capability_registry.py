@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Iterable
 
 from wilfred.capabilities import CapabilityDefinition, DomainDefinition
-from wilfred.plugins import PluginDefinition
+from wilfred.plugins.contracts import PluginDefinition
 
 
 @dataclass(frozen=True)
