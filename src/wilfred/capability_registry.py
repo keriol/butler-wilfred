@@ -30,28 +30,25 @@ class CapabilityRegistry:
         self._capabilities: dict[str, CapabilityRegistration] = {}
 
     def register_plugin(self, plugin: PluginDefinition) -> None:
-        domain_conflicts = sorted(
-            domain.identity
-            for domain in plugin.domains
-            if domain.identity in self._domains
-        )
-        capability_conflicts = sorted(
-            capability.identity
-            for capability in plugin.capabilities
-            if capability.identity in self._capabilities
-        )
+        for domain in plugin.domains:
+            previous = self._domains.get(domain.identity)
 
-        if domain_conflicts:
-            raise ValueError(
-                "Duplicate domain identities: "
-                + ", ".join(domain_conflicts)
-            )
+            if previous is not None:
+                raise ValueError(
+                    f"Duplicate domain identity {domain.identity!r} "
+                    f"declared by plugins {previous.owner_plugin!r} "
+                    f"and {plugin.name!r}."
+                )
 
-        if capability_conflicts:
-            raise ValueError(
-                "Duplicate capability identities: "
-                + ", ".join(capability_conflicts)
-            )
+        for capability in plugin.capabilities:
+            previous = self._capabilities.get(capability.identity)
+
+            if previous is not None:
+                raise ValueError(
+                    f"Duplicate capability identity {capability.identity!r} "
+                    f"declared by plugins {previous.owner_plugin!r} "
+                    f"and {plugin.name!r}."
+                )
 
         for domain in plugin.domains:
             self._domains[domain.identity] = DomainRegistration(
