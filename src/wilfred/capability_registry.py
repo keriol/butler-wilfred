@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable
+from typing import TYPE_CHECKING, Iterable
 
 from wilfred.capabilities import CapabilityDefinition, DomainDefinition
-from wilfred.plugins.contracts import PluginDefinition
+
+
+if TYPE_CHECKING:
+    from wilfred.plugins.contracts import PluginDefinition
 
 
 @dataclass(frozen=True)
