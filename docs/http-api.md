@@ -65,12 +65,50 @@ Returns transport liveness without calling a planner provider:
 
 ### GET /v1/runtime
 
-Returns credential-free runtime metadata and the registered tool count.
+Returns credential-free runtime metadata including registered tool, domain and
+capability counts.
 
 ### GET /v1/tools
 
 Returns deterministic public tool descriptions, including parameter schemas
 and permissions. Python handlers are never exposed.
+
+### GET /v1/domains
+
+Returns deterministic domain metadata from the loaded capability registry:
+
+```json
+{
+  "domains": [
+    {
+      "name": "media",
+      "description": "Media discovery and playback.",
+      "owner_plugin": "example.media"
+    }
+  ]
+}
+```
+
+### GET /v1/capabilities
+
+Returns deterministic, sanitized capability metadata:
+
+```json
+{
+  "capabilities": [
+    {
+      "name": "media.playback",
+      "domain": "media",
+      "description": "Play resolved media.",
+      "owner_plugin": "example.media"
+    }
+  ]
+}
+```
+
+Discovery responses expose semantic metadata only. Resolver handlers, provider
+configuration, credentials and private runtime payloads are not part of the
+schema.
 
 ### POST /v1/goals
 
@@ -118,6 +156,20 @@ The response preserves the shared structured planning and execution result:
   }
 }
 ```
+
+## CLI discovery
+
+Capability discovery is also available without starting the HTTP transport or
+configuring a planner:
+
+```bash
+wilfred domains
+wilfred capabilities
+```
+
+Configured plugins can be supplied with repeated `--plugin MODULE:FACTORY`
+arguments or through `WILFRED_PLUGINS`. These commands load plugin declarations
+for introspection but do not call a planner provider.
 
 ## Confirmation boundary
 

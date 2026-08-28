@@ -4,7 +4,9 @@ from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
 import json
 
+from wilfred import CapabilityDefinition, DomainDefinition
 from wilfred.__main__ import main
+from wilfred.plugins import PluginDefinition
 
 
 def run_cli(arguments: list[str]) -> tuple[int, str, str]:
@@ -41,6 +43,78 @@ def test_tools_command() -> None:
         "wilfred_status",
         "wilfred_tools",
     ]
+
+
+def test_domains_and_capabilities_commands_expose_plugin_metadata(
+    monkeypatch,
+) -> None:
+    plugin = PluginDefinition(
+        name="test.media",
+        register=lambda registry: None,
+        domains=(
+            DomainDefinition(
+                name="media",
+                description="Media domain.",
+            ),
+        ),
+        capabilities=(
+            CapabilityDefinition(
+                name="playback",
+                domain="media",
+                description="Play media.",
+            ),
+        ),
+    )
+
+    monkeypatch.setattr(
+        "wilfred.__main__.discover_configured_plugins",
+        lambda specs, environ: [plugin],
+    )
+
+    domains_result, domains_output, domains_errors = run_cli(
+        ["domains", "--plugin", "test:factory"]
+    )
+    capabilities_result, capabilities_output, capabilities_errors = run_cli(
+        ["capabilities", "--plugin", "test:factory"]
+    )
+
+    assert domains_result == 0
+    assert capabilities_result == 0
+    assert domains_errors == ""
+    assert capabilities_errors == ""
+    assert json.loads(domains_output) == {
+        "domains": [
+            {
+                "name": "media",
+                "description": "Media domain.",
+                "owner_plugin": "test.media",
+            }
+        ]
+    }
+    assert json.loads(capabilities_output) == {
+        "capabilities": [
+            {
+                "name": "media.playback",
+                "domain": "media",
+                "description": "Play media.",
+                "owner_plugin": "test.media",
+            }
+        ]
+    }
+
+
+def test_discovery_commands_do_not_require_planner_configuration() -> None:
+    domains_result, domains_output, domains_errors = run_cli(["domains"])
+    capabilities_result, capabilities_output, capabilities_errors = run_cli(
+        ["capabilities"]
+    )
+
+    assert domains_result == 0
+    assert capabilities_result == 0
+    assert domains_errors == ""
+    assert capabilities_errors == ""
+    assert json.loads(domains_output) == {"domains": []}
+    assert json.loads(capabilities_output) == {"capabilities": []}
 
 
 def test_no_command_preserves_existing_cli() -> None:

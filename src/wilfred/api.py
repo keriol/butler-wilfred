@@ -50,6 +50,8 @@ class RuntimeResponse(BaseModel):
     version: str
     runtime: str
     tool_count: int
+    domain_count: int
+    capability_count: int
 
 
 class ToolResponse(BaseModel):
@@ -62,6 +64,27 @@ class ToolResponse(BaseModel):
 
 class ToolsResponse(BaseModel):
     tools: list[ToolResponse]
+
+
+class DomainResponse(BaseModel):
+    name: str
+    description: str
+    owner_plugin: str
+
+
+class DomainsResponse(BaseModel):
+    domains: list[DomainResponse]
+
+
+class CapabilityResponse(BaseModel):
+    name: str
+    domain: str
+    description: str
+    owner_plugin: str
+
+
+class CapabilitiesResponse(BaseModel):
+    capabilities: list[CapabilityResponse]
 
 
 class GoalRequest(BaseModel):
@@ -282,6 +305,22 @@ def create_app(
     def tools() -> dict[str, object]:
         return {"tools": runtime.describe_tools()}
 
+    @app.get(
+        "/v1/domains",
+        response_model=DomainsResponse,
+        tags=["runtime"],
+    )
+    def domains() -> dict[str, object]:
+        return {"domains": runtime.describe_domains()}
+
+    @app.get(
+        "/v1/capabilities",
+        response_model=CapabilitiesResponse,
+        tags=["runtime"],
+    )
+    def capabilities() -> dict[str, object]:
+        return {"capabilities": runtime.describe_capabilities()}
+
     @app.post(
         "/v1/goals",
         response_model=GoalResponse,
@@ -348,8 +387,10 @@ def serve_api(
 
 
 __all__ = [
+    "CapabilitiesResponse",
     "DEFAULT_HOST",
     "DEFAULT_PORT",
+    "DomainsResponse",
     "GoalRequest",
     "GoalResponse",
     "HTTPAPIUnavailableError",
