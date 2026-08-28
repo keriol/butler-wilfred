@@ -43,6 +43,8 @@ class CapabilityRegistry:
                     f"and {plugin.name!r}."
                 )
 
+        pending_resolver_owners = dict(self._resolver_owners)
+
         for capability in plugin.capabilities:
             previous = self._capabilities.get(capability.identity)
 
@@ -54,7 +56,7 @@ class CapabilityRegistry:
                 )
 
             for resolver in capability.resolvers:
-                previous_capability = self._resolver_owners.get(resolver.name)
+                previous_capability = pending_resolver_owners.get(resolver.name)
 
                 if previous_capability is not None:
                     raise ValueError(
@@ -62,6 +64,8 @@ class CapabilityRegistry:
                         f"owned by capabilities {previous_capability!r} "
                         f"and {capability.identity!r}."
                     )
+
+                pending_resolver_owners[resolver.name] = capability.identity
 
         for domain in plugin.domains:
             self._domains[domain.identity] = DomainRegistration(
