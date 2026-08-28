@@ -6,6 +6,7 @@ from wilfred import (
     ExecutionStatus,
     ToolPermission,
     ToolRegistry,
+    WilfredRuntime,
 )
 from wilfred.plugins import (
     PluginDefinition,
@@ -89,6 +90,14 @@ class WilfredPluginTests(unittest.TestCase):
             ("demo_echo",),
         )
         self.assertEqual(
+            results[0].domain_names,
+            ("demo",),
+        )
+        self.assertEqual(
+            results[0].capability_names,
+            ("demo.echo",),
+        )
+        self.assertEqual(
             registry.names(),
             ["demo_echo"],
         )
@@ -125,6 +134,41 @@ class WilfredPluginTests(unittest.TestCase):
         self.assertEqual(
             first.value,
             second.value,
+        )
+
+    def test_demo_capability_resolves_and_executes_without_planner(self) -> None:
+        plugins = discover_plugins(
+            [
+                "wilfred.plugins.demo_echo",
+            ]
+        )
+
+        runtime = WilfredRuntime(
+            provider=lambda *args: (_ for _ in ()).throw(
+                AssertionError("planner provider must not be called")
+            ),
+            system_prompt="Reference plugin test.",
+            plugins=plugins,
+        )
+
+        result = runtime.execute_goal("echo hello from capability")
+
+        self.assertIsNotNone(result.execution)
+        self.assertEqual(
+            result.execution.status,
+            ExecutionStatus.SUCCESS,
+        )
+        self.assertEqual(
+            result.execution.value,
+            {"message": "hello from capability"},
+        )
+        self.assertEqual(
+            runtime.domain_names(),
+            ("demo",),
+        )
+        self.assertEqual(
+            runtime.capability_names(),
+            ("demo.echo",),
         )
 
     def test_unknown_tool_is_rejected(self) -> None:
