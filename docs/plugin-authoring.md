@@ -1,0 +1,165 @@
+# Plugin authoring guide
+
+Wilfred plugins package integrations, executable tools and semantic behavior without moving provider-specific knowledge into Butler Core.
+
+The built-in `demo.echo` plugin is the reference implementation. It is intentionally dependency-free, but it models the same ownership boundaries expected from a real integration:
+
+`provider → plugin → domain → capability → resolver → tool`
+
+## Ownership model
+
+Each layer has one job.
+
+- **Provider / integration** connects to or adapts an external service. In the reference plugin, `EchoProvider` is the provider boundary and `LocalEchoProvider` is the dependency-free example implementation.
+- **Plugin** packages everything that belongs together and declares what it contributes to Wilfred.
+- **Domain** owns related knowledge and behavior. The reference plugin declares the `demo` domain.
+- **Capability** names something the Butler knows how to do inside that domain. The reference plugin declares `demo.echo`.
+- **Resolver** deterministically recognizes goals that the capability can handle and produces a normal tool plan. The reference resolver is `demo.echo.text`.
+- **Tool** is the typed executable operation. The reference tool is `demo_echo` and is classified `READ`.
+
+The capability registry and tool registry remain separate. Semantic ownership does not make a capability executable by itself, and executable tools do not implicitly define semantic ownership.
+
+## Reference implementation
+
+The provider boundary is explicit even though the example does not need a network service:
+
+```python
+class EchoProvider(Protocol):
+    def echo(self, message: str) -> str:
+        ...
+
+
+class LocalEchoProvider:
+    def echo(self, message: str) -> str:
+        return message
+```
+
+The tool delegates provider-specific work through that boundary:
+
+```python
+def echo_message(message: str) -> dict[str, str]:
+    return {"message": _provider.echo(message)}
+```
+
+The domain and capability declare semantic ownership:
+
+```python
+demo_domain = DomainDefinition(
+    name="demo",
+    description="Dependency-free examples for Wilfred plugin authors.",
+)
+
+demo_echo_capability = CapabilityDefinition(
+    name="echo",
+    domain="demo",
+    resolvers=(
+        ResolverDefinition(
+            name="demo.echo.text",
+            handler=resolve_demo_echo,
+        ),
+    ),
+)
+```
+
+The resolver handles only goals it recognizes. Otherwise it returns `NOT_HANDLED`, preserving planner fallback:
+
+```python
+def resolve_demo_echo(message: str) -> ResolutionResult:
+    if not message.strip().lower().startswith("echo "):
+        return ResolutionResult.not_handled_result()
+
+    return ResolutionResult.handled_result(
+        PlannerResult(
+            status=PlannerStatus.SUCCESS,
+            duration_ms=0.0,
+            plan=ToolPlan(
+                tool_name="demo_echo",
+                arguments={"message": message[5:].strip()},
+                confidence=1.0,
+                reason="demo.echo deterministic resolver",
+            ),
+        )
+    )
+```
+
+Finally the plugin declares both executable and semantic contributions:
+
+```python
+plugin = PluginDefinition(
+    name="demo.echo",
+    register=register_demo_echo_tools,
+    domains=(demo_domain,),
+    capabilities=(demo_echo_capability,),
+)
+```
+
+## Load and inspect the plugin
+
+The reference plugin is included in the normal Wilfred distribution and can be discovered like any other public plugin:
+
+```python
+from wilfred import ToolRegistry, discover_plugins, load_plugins
+
+registry = ToolRegistry()
+plugins = discover_plugins(["wilfred.plugins.demo_echo"])
+results = load_plugins(registry, plugins)
+
+assert results[0].tool_names == ("demo_echo",)
+assert results[0].domain_names == ("demo",)
+assert results[0].capability_names == ("demo.echo",)
+```
+
+Use `WilfredRuntime` when you want capability-owned resolvers to participate in deterministic goal resolution:
+
+```python
+from wilfred import WilfredRuntime, discover_plugins
+
+plugins = discover_plugins(["wilfred.plugins.demo_echo"])
+
+runtime = WilfredRuntime(
+    provider=planner_provider,
+    system_prompt="You are a Butler runtime.",
+    plugins=plugins,
+)
+
+result = runtime.execute_goal("echo hello")
+```
+
+`demo.echo.text` resolves the goal before planner fallback, but the resulting `demo_echo` tool still executes through the normal Execution Engine and permission policy.
+
+## Authoring rules
+
+Keep these boundaries stable when creating a real plugin:
+
+1. Keep service authentication, clients and transport details in the provider/integration layer.
+2. Register typed executable operations as tools with the correct permission classification.
+3. Declare semantic ownership explicitly with domains and capabilities.
+4. Put deterministic recognition beside the capability that owns it.
+5. Return `NOT_HANDLED` when the resolver cannot confidently own a goal.
+6. Never bypass Execution Engine policy, confirmation or post-action verification from a resolver.
+7. Keep frontend presentation and provider-specific rendering outside Butler Core.
+8. Do not put secrets, private endpoints or deployment-specific identifiers in public plugin metadata.
+
+## Testing a plugin
+
+A useful plugin test set should prove at least:
+
+- discovery returns the intended `PluginDefinition`;
+- tools register deterministically;
+- domain and capability identities are reported by `PluginLoadResult`;
+- deterministic goals resolve through capability-owned resolvers;
+- unhandled goals preserve planner fallback;
+- ACTION or DANGEROUS tools still require the normal policy/confirmation path;
+- installation from a built wheel works in a clean environment.
+
+Wilfred's own `tests/test_plugins.py`, capability resolver tests and clean-room distribution test exercise those boundaries for the reference plugin.
+
+## From the reference plugin to a real integration
+
+Replace `LocalEchoProvider` with a provider adapter that owns the actual external-service connection. Keep the rest of the shape intact:
+
+`external service → provider adapter → plugin package → domain/capability → resolver → typed tool → Execution Engine`
+
+The Home Assistant plugin is a real consumer of the same public model, but it is intentionally not used as the authoring example so the reference remains small, installable and independent of any particular home-automation platform.
+
+For the detailed semantic contracts and deterministic ordering rules, see [Capability and domain contracts](capability-domain-contracts.md).
