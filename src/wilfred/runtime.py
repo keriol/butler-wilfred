@@ -9,6 +9,7 @@ from butler_core import (
 )
 
 from wilfred import __version__
+from wilfred.capability_registry import CapabilityRegistry
 from wilfred.native import (
     describe_tool,
     register_native_tools,
@@ -46,11 +47,14 @@ class WilfredRuntime:
         acknowledgement_text: str | None = None,
     ) -> None:
         registry = ToolRegistry()
+        loaded_plugins = tuple(plugins)
+        capability_registry = CapabilityRegistry.from_plugins(loaded_plugins)
 
         register_native_tools(registry)
-        load_plugins(registry, plugins)
+        load_plugins(registry, loaded_plugins)
 
         self._registry = registry
+        self._capability_registry = capability_registry
         self._acknowledgement_adapter = acknowledgement_adapter
         self._acknowledgement_text = acknowledgement_text
         self._planned_execution = PlannedExecution(
@@ -67,6 +71,12 @@ class WilfredRuntime:
     def tool_names(self) -> list[str]:
         return self._registry.names()
 
+    def domain_names(self) -> list[str]:
+        return self._capability_registry.domain_names()
+
+    def capability_names(self) -> list[str]:
+        return self._capability_registry.capability_names()
+
     def describe_runtime(self) -> dict[str, object]:
         """Return public, credential-free runtime metadata."""
 
@@ -76,6 +86,10 @@ class WilfredRuntime:
             "version": __version__,
             "runtime": "goal-runtime",
             "tool_count": len(self._registry.names()),
+            "domain_count": len(self._capability_registry.domain_names()),
+            "capability_count": len(
+                self._capability_registry.capability_names()
+            ),
         }
 
     def describe_tools(self) -> list[dict[str, object]]:
@@ -87,6 +101,16 @@ class WilfredRuntime:
         )
 
         return [describe_tool(tool) for tool in tools]
+
+    def describe_domains(self) -> list[dict[str, str]]:
+        """Return deterministic public domain metadata."""
+
+        return self._capability_registry.describe_domains()
+
+    def describe_capabilities(self) -> list[dict[str, str]]:
+        """Return deterministic public capability metadata."""
+
+        return self._capability_registry.describe_capabilities()
 
     def execute_goal(
         self,
