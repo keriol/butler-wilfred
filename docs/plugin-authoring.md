@@ -38,7 +38,7 @@ The tool delegates provider-specific work through that boundary:
 
 ```python
 def echo_message(message: str) -> dict[str, str]:
-    return {"message": provider.echo(message)}
+    return {"message": _provider.echo(message)}
 ```
 
 The domain and capability declare semantic ownership:
