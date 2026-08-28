@@ -9,6 +9,7 @@ from wilfred.capabilities import (
     CapabilityDefinition,
     DomainDefinition,
 )
+from wilfred.capability_registry import CapabilityRegistry
 from wilfred.config import (
     ButlerIdentity,
     ConfigurationError,
@@ -69,6 +70,7 @@ from wilfred.runtime import WilfredRuntime
 __all__ = [
     "ButlerIdentity",
     "CapabilityDefinition",
+    "CapabilityRegistry",
     "ConfigurationError",
     "DomainDefinition",
     "ExecutionEngine",
