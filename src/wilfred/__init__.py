@@ -52,6 +52,11 @@ from wilfred.plugins import (
     load_plugins,
 )
 from wilfred.registry import ToolRegistry
+from wilfred.verification import (
+    GoalExpectation,
+    VerificationResult,
+    verify_plugins,
+)
 from wilfred.workflows import (
     ReadActionVerifyRequest,
     ReadActionVerifyResult,
@@ -78,6 +83,7 @@ __all__ = [
     "ExecutionRequest",
     "ExecutionResult",
     "ExecutionStatus",
+    "GoalExpectation",
     "OutputAdapter",
     "OutputCapability",
     "OutputDeliveryResult",
@@ -98,6 +104,7 @@ __all__ = [
     "ToolDefinition",
     "ToolPermission",
     "ToolRegistry",
+    "VerificationResult",
     "VerificationStatus",
     "WorkflowPersistenceError",
     "WorkflowRecord",
@@ -107,5 +114,6 @@ __all__ = [
     "load_plugin",
     "load_plugins",
     "validate_arguments",
+    "verify_plugins",
     "__version__",
 ]
