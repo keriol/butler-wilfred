@@ -20,6 +20,7 @@ from wilfred.models import (
 )
 from wilfred.plugins.contracts import PluginDefinition
 from wilfred.registry import ToolRegistry
+from wilfred.verification import GoalExpectation
 
 
 class EchoProvider(Protocol):
@@ -119,6 +120,21 @@ demo_echo_capability = CapabilityDefinition(
 )
 
 
+demo_echo_expectation = GoalExpectation(
+    identity="demo.echo.basic",
+    goal="echo hello from verification",
+    capability="demo.echo",
+    tool_name="demo_echo",
+    expected_arguments={
+        "message": "hello from verification",
+    },
+    expected_value={
+        "message": "hello from verification",
+    },
+    verify_value=True,
+)
+
+
 plugin = PluginDefinition(
     name="demo.echo",
     version="0.1.0",
@@ -128,4 +144,5 @@ plugin = PluginDefinition(
     register=register_demo_echo_tools,
     domains=(demo_domain,),
     capabilities=(demo_echo_capability,),
+    verification=(demo_echo_expectation,),
 )
