@@ -40,6 +40,47 @@ Capability identity is deterministic and domain-qualified. This prevents the sam
 
 Both definitions are immutable value objects. Equivalent definitions compare equally and can be used wherever deterministic public metadata is required.
 
+## Plugin declarations
+
+A public plugin may declare the domains and capabilities it owns alongside its existing tool registrar:
+
+```python
+from wilfred import CapabilityDefinition, DomainDefinition
+from wilfred.plugins import PluginDefinition
+
+plugin = PluginDefinition(
+    name="example.media",
+    register=register_tools,
+    domains=(
+        DomainDefinition(
+            name="media",
+            description="Media discovery and playback.",
+        ),
+    ),
+    capabilities=(
+        CapabilityDefinition(
+            name="playback",
+            domain="media",
+            description="Play resolved media.",
+        ),
+    ),
+)
+```
+
+Declarations are normalized into deterministic identity order. A capability must reference a domain declared by the same plugin, making semantic ownership explicit rather than inferred from tool names or conversation code.
+
+When multiple plugins are loaded together, Wilfred validates semantic ownership before mutating the shared tool registry. Duplicate domain identities are rejected clearly rather than allowing two plugins to become competing owners.
+
+`PluginLoadResult` reports the deterministic `domain_names` and `capability_names` contributed by each loaded plugin in addition to its registered `tool_names`.
+
+## Compatibility
+
+Existing tool-only plugins remain valid. `domains` and `capabilities` default to empty tuples, so current plugin factories and current `WilfredRuntime` construction do not need to change merely to keep working.
+
+A plugin that declares capabilities opts into the semantic ownership contract. It must also declare the corresponding domains it owns.
+
+Runtime-wide capability discovery and capability-owned deterministic resolver composition are separate follow-up layers. They should consume these declarations rather than create parallel semantic registries.
+
 ## Ownership boundary
 
 The contracts intentionally do not introduce another registry into Butler Core or Wilfred.
@@ -53,12 +94,4 @@ The current separation remains:
 - tool: typed executable operation;
 - goal: requested outcome.
 
-Butler Core remains provider-neutral and continues to own generic execution and resolution foundations. Wilfred owns the semantic capability/domain model.
-
-## Compatibility and next step
-
-Existing tool-only plugins and existing `WilfredRuntime` construction are unchanged by these contracts. A consumer does not need to declare domains or capabilities merely to continue using the current public plugin/tool APIs.
-
-Plugin declaration, loading, duplicate-identity validation and runtime capability discovery are deliberately separate follow-up work. They must build on these contracts rather than duplicating them.
-
-This separation keeps the first public contract small and avoids making speculative registry or loader behaviour part of the compatibility surface before it is needed.
+Butler Core remains provider-neutral and continues to own generic execution and resolution foundations. Wilfred owns the semantic capability/domain model and plugin-level declaration rules.
