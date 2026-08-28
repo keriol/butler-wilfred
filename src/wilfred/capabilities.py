@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 import re
 
+from butler_core import ResolverDefinition
+
 
 _PUBLIC_NAME_PATTERN = re.compile(
     r"[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*"
@@ -40,10 +42,36 @@ class CapabilityDefinition:
     name: str
     domain: str
     description: str = ""
+    resolvers: tuple[ResolverDefinition, ...] = ()
 
     def __post_init__(self) -> None:
         _validate_public_name("capability", self.name)
         _validate_public_name("domain", self.domain)
+
+        resolvers = tuple(self.resolvers)
+
+        if not all(
+            isinstance(resolver, ResolverDefinition)
+            for resolver in resolvers
+        ):
+            raise TypeError(
+                "Capability resolvers must contain ResolverDefinition values."
+            )
+
+        resolver_names = [resolver.name for resolver in resolvers]
+        duplicate_resolvers = sorted(
+            name
+            for name in set(resolver_names)
+            if resolver_names.count(name) > 1
+        )
+
+        if duplicate_resolvers:
+            raise ValueError(
+                f"Capability {self.identity!r} declares duplicate resolvers: "
+                f"{', '.join(duplicate_resolvers)}"
+            )
+
+        object.__setattr__(self, "resolvers", resolvers)
 
     @property
     def identity(self) -> str:
