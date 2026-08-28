@@ -8,6 +8,7 @@ from pathlib import Path
 import sys
 
 from wilfred import __version__
+from wilfred.capability_registry import CapabilityRegistry
 from wilfred.config import (
     ConfigurationError,
     RuntimeConfig,
@@ -47,7 +48,6 @@ def _api_port(value: str) -> int:
     return port
 
 
-
 def _plugin_specs(
     cli_values: Sequence[str],
     environ: Mapping[str, str],
@@ -74,6 +74,18 @@ def _plugin_specs(
         )
     )
 
+
+def _add_plugin_argument(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--plugin",
+        action="append",
+        default=[],
+        metavar="MODULE:FACTORY",
+        help=(
+            "Load a configured plugin factory. "
+            "May be repeated."
+        ),
+    )
 
 
 def runtime_status(
@@ -131,8 +143,20 @@ def build_parser() -> argparse.ArgumentParser:
     )
     commands.add_parser(
         "tools",
-        help="List Wilfred native capabilities.",
+        help="List Wilfred native tools.",
     )
+
+    domains = commands.add_parser(
+        "domains",
+        help="List domains declared by configured plugins.",
+    )
+    _add_plugin_argument(domains)
+
+    capabilities = commands.add_parser(
+        "capabilities",
+        help="List capabilities declared by configured plugins.",
+    )
+    _add_plugin_argument(capabilities)
 
     goal = commands.add_parser(
         "goal",
@@ -153,16 +177,7 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="Provider model identifier.",
     )
-    goal.add_argument(
-        "--plugin",
-        action="append",
-        default=[],
-        metavar="MODULE:FACTORY",
-        help=(
-            "Load a configured plugin factory. "
-            "May be repeated."
-        ),
-    )
+    _add_plugin_argument(goal)
 
     goal.add_argument(
         "--confirmed",
@@ -177,16 +192,7 @@ def build_parser() -> argparse.ArgumentParser:
             "Serve the goal runtime through the optional HTTP API."
         ),
     )
-    api.add_argument(
-        "--plugin",
-        action="append",
-        default=[],
-        metavar="MODULE:FACTORY",
-        help=(
-            "Load a configured plugin factory. "
-            "May be repeated."
-        ),
-    )
+    _add_plugin_argument(api)
 
     api.add_argument(
         "--provider",
@@ -242,6 +248,34 @@ def run_native_command(command: str) -> int:
     print(
         json.dumps(
             result.value,
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+    )
+    return 0
+
+
+def run_discovery_command(
+    *,
+    command: str,
+    plugin_specs: Sequence[str],
+    environ: Mapping[str, str],
+) -> int:
+    plugins = discover_configured_plugins(
+        plugin_specs,
+        environ=environ,
+    )
+    registry = CapabilityRegistry.from_plugins(plugins)
+
+    payload = (
+        {"domains": registry.describe_domains()}
+        if command == "domains"
+        else {"capabilities": registry.describe_capabilities()}
+    )
+
+    print(
+        json.dumps(
+            payload,
             ensure_ascii=False,
             sort_keys=True,
         )
@@ -370,6 +404,21 @@ def main(
 
     if arguments.command in {"status", "tools"}:
         return run_native_command(arguments.command)
+
+    if arguments.command in {"domains", "capabilities"}:
+        effective_environment = (
+            os.environ
+            if environ is None
+            else environ
+        )
+        return run_discovery_command(
+            command=arguments.command,
+            plugin_specs=_plugin_specs(
+                arguments.plugin,
+                effective_environment,
+            ),
+            environ=effective_environment,
+        )
 
     if arguments.command == "goal":
         effective_environment = (
