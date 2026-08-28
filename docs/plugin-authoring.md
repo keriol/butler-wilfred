@@ -16,6 +16,7 @@ Each layer has one job.
 - **Capability** names something the Butler knows how to do inside that domain. The reference plugin declares `demo.echo`.
 - **Resolver** deterministically recognizes goals that the capability can handle and produces a normal tool plan. The reference resolver is `demo.echo.text`.
 - **Tool** is the typed executable operation. The reference tool is `demo_echo` and is classified `READ`.
+- **Verification contribution** declares behavior that the plugin promises should remain true. Wilfred owns the harness that executes those expectations.
 
 The capability registry and tool registry remain separate. Semantic ownership does not make a capability executable by itself, and executable tools do not implicitly define semantic ownership.
 
@@ -82,7 +83,25 @@ def resolve_demo_echo(message: str) -> ResolutionResult:
     )
 ```
 
-Finally the plugin declares both executable and semantic contributions:
+The same plugin can declare deterministic verification expectations without embedding pytest or arbitrary executable test callbacks:
+
+```python
+demo_echo_expectation = GoalExpectation(
+    identity="demo.echo.basic",
+    goal="echo hello from verification",
+    capability="demo.echo",
+    tool_name="demo_echo",
+    expected_arguments={
+        "message": "hello from verification",
+    },
+    expected_value={
+        "message": "hello from verification",
+    },
+    verify_value=True,
+)
+```
+
+Finally the plugin declares executable, semantic and verification contributions together:
 
 ```python
 plugin = PluginDefinition(
@@ -90,6 +109,7 @@ plugin = PluginDefinition(
     register=register_demo_echo_tools,
     domains=(demo_domain,),
     capabilities=(demo_echo_capability,),
+    verification=(demo_echo_expectation,),
 )
 ```
 
@@ -127,6 +147,25 @@ result = runtime.execute_goal("echo hello")
 
 `demo.echo.text` resolves the goal before planner fallback, but the resulting `demo_echo` tool still executes through the normal Execution Engine and permission policy.
 
+## Verify declared expectations
+
+Verification declarations describe expected behavior. They do not execute during plugin import or normal runtime composition.
+
+A shared harness collects them from the loaded plugin set and executes deterministic goals through the normal `WilfredRuntime` path:
+
+```python
+from wilfred import discover_plugins, verify_plugins
+
+plugins = discover_plugins(["wilfred.plugins.demo_echo"])
+results = verify_plugins(plugins)
+
+assert results[0].passed is True
+```
+
+Each `VerificationResult` contains the expectation ID, plugin name, PASS/FAIL state and deterministic diagnostics. Duplicate expectation identities within one plugin are rejected when the `PluginDefinition` is constructed. Expectations must reference capabilities owned by that same plugin.
+
+This first public contract is intentionally provider-neutral and goal-level. Frontend-specific regression data belongs to the frontend that owns it. A future Alexa frontend, for example, may compose utterance expectations with the same principle without introducing Alexa intents, slots or SMAPI concepts into Butler Core or Wilfred's provider-neutral runtime.
+
 ## Authoring rules
 
 Keep these boundaries stable when creating a real plugin:
@@ -137,8 +176,9 @@ Keep these boundaries stable when creating a real plugin:
 4. Put deterministic recognition beside the capability that owns it.
 5. Return `NOT_HANDLED` when the resolver cannot confidently own a goal.
 6. Never bypass Execution Engine policy, confirmation or post-action verification from a resolver.
-7. Keep frontend presentation and provider-specific rendering outside Butler Core.
-8. Do not put secrets, private endpoints or deployment-specific identifiers in public plugin metadata.
+7. Declare representative deterministic expectations instead of embedding test-framework execution in plugin import paths.
+8. Keep frontend presentation and provider-specific rendering outside Butler Core.
+9. Do not put secrets, private endpoints or deployment-specific identifiers in public plugin metadata or verification declarations.
 
 ## Testing a plugin
 
@@ -148,11 +188,13 @@ A useful plugin test set should prove at least:
 - tools register deterministically;
 - domain and capability identities are reported by `PluginLoadResult`;
 - deterministic goals resolve through capability-owned resolvers;
+- declared verification expectations pass through the shared harness;
+- expectation mismatches produce structured failures;
 - unhandled goals preserve planner fallback;
 - ACTION or DANGEROUS tools still require the normal policy/confirmation path;
 - installation from a built wheel works in a clean environment.
 
-Wilfred's own `tests/test_plugins.py`, capability resolver tests and clean-room distribution test exercise those boundaries for the reference plugin.
+Wilfred's own plugin, capability resolver, verification and clean-room distribution tests exercise those boundaries for the reference plugin.
 
 ## From the reference plugin to a real integration
 
