@@ -164,11 +164,11 @@ class WilfredPluginTests(unittest.TestCase):
         )
         self.assertEqual(
             runtime.domain_names(),
-            ("demo",),
+            ["demo"],
         )
         self.assertEqual(
             runtime.capability_names(),
-            ("demo.echo",),
+            ["demo.echo"],
         )
 
     def test_unknown_tool_is_rejected(self) -> None:
