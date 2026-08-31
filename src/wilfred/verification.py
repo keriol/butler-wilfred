@@ -1,42 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Iterable, Mapping
+from typing import TYPE_CHECKING, Iterable
 
-from butler_core import ExecutionStatus
+from butler_core import ExecutionStatus, GoalExpectation
 
 if TYPE_CHECKING:
     from wilfred.plugins import PluginDefinition
-
-
-@dataclass(frozen=True)
-class GoalExpectation:
-    """Declarative deterministic goal expectation owned by a plugin."""
-
-    identity: str
-    goal: str
-    capability: str
-    tool_name: str
-    expected_arguments: Mapping[str, object] | None = None
-    expected_value: object | None = None
-    verify_value: bool = False
-
-    def __post_init__(self) -> None:
-        for field_name, value in (
-            ("identity", self.identity),
-            ("goal", self.goal),
-            ("capability", self.capability),
-            ("tool_name", self.tool_name),
-        ):
-            if not value.strip():
-                raise ValueError(f"{field_name} cannot be empty.")
-
-        if self.expected_arguments is not None:
-            object.__setattr__(
-                self,
-                "expected_arguments",
-                dict(self.expected_arguments),
-            )
 
 
 @dataclass(frozen=True)
