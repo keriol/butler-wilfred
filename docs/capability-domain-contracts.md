@@ -1,11 +1,15 @@
 # Capability and domain contracts
 
-Wilfred models semantic ownership explicitly through two provider-neutral public contracts:
+Wilfred exposes provider-neutral semantic contribution contracts owned by Butler Core through its existing public import surfaces:
 
 - `DomainDefinition` identifies a domain that owns related knowledge and behaviour;
-- `CapabilityDefinition` identifies something the Butler knows how to do inside one domain.
+- `CapabilityDefinition` identifies something the Butler knows how to do inside one domain;
+- `PluginDefinition` groups tool registration, semantic declarations and verification expectations;
+- `GoalExpectation` declares deterministic behavior a capability promises.
 
-These contracts describe semantic ownership. They do not connect to external services, execute operations or replace the tool registry.
+These value contracts are defined by Butler Core so the same domain package can be consumed by multiple Butler runtimes without importing Wilfred merely to describe its semantic surface. Wilfred re-exports the exact Core classes for compatibility.
+
+Wilfred still owns runtime composition: capability aggregation, plugin discovery/loading, deterministic runtime composition and executable verification remain Wilfred responsibilities.
 
 ## DomainDefinition
 
@@ -47,11 +51,11 @@ Capability identity is deterministic and domain-qualified. This prevents the sam
 
 A capability may own zero or more Butler Core `ResolverDefinition` values. Resolver declaration order is explicit and preserved inside the capability. Duplicate resolver names inside one capability are rejected.
 
-Both definitions are immutable value objects. Equivalent definitions compare equally and can be used wherever deterministic public metadata is required.
+Both definitions are immutable Core value objects. Equivalent definitions compare equally and can be used wherever deterministic public metadata is required.
 
 ## Plugin declarations
 
-A public plugin may declare the domains and capabilities it owns alongside its existing tool registrar:
+A public plugin may declare the domains and capabilities it owns alongside its tool registrar:
 
 ```python
 from wilfred import CapabilityDefinition, DomainDefinition
@@ -70,17 +74,19 @@ plugin = PluginDefinition(
 )
 ```
 
+`PluginDefinition` is also a Butler Core contract. Core validates declaration structure and ownership relationships without becoming responsible for discovery, loading or runtime lifecycle.
+
 Declarations are normalized into deterministic identity order. A capability must reference a domain declared by the same plugin, making semantic ownership explicit rather than inferred from tool names or conversation code.
 
 When multiple plugins are loaded together, Wilfred validates semantic ownership before mutating the shared tool registry. Duplicate domain and capability identities are rejected clearly rather than allowing competing owners.
 
 Resolver names must also be unique across loaded capabilities. Butler Core reports the resolver name in resolution results and traces, so global uniqueness keeps that evidence attributable to one capability.
 
-`PluginLoadResult` reports the deterministic `domain_names` and `capability_names` contributed by each loaded plugin in addition to its registered `tool_names`.
+`PluginLoadResult` remains a Wilfred runtime result and reports the deterministic `domain_names` and `capability_names` contributed by each loaded plugin in addition to its registered `tool_names`.
 
 ## Runtime introspection
 
-`CapabilityRegistry` composes the semantic declarations from loaded plugins into a deterministic queryable view. It is separate from `ToolRegistry`: the tool registry remains the owner of executable operations, while the capability registry owns semantic metadata, plugin ownership and resolver composition.
+`CapabilityRegistry` belongs to Wilfred. It composes Core semantic declarations from loaded plugins into a deterministic queryable runtime view. It is separate from `ToolRegistry`: the tool registry remains the owner of executable operations, while the capability registry owns runtime aggregation, plugin ownership and resolver composition.
 
 `WilfredRuntime` exposes the semantic view directly:
 
@@ -113,9 +119,19 @@ A capability resolver only resolves a goal into the normal planning result. It d
 
 If every deterministic resolver returns `NOT_HANDLED`, planner fallback remains unchanged.
 
+## Verification contributions
+
+`GoalExpectation` is a Butler Core declaration contract. It can therefore travel with a reusable domain package without importing Wilfred.
+
+Wilfred owns executable verification through `verify_plugins()` and returns Wilfred-specific `VerificationResult` values. Core does not discover plugins, instantiate Wilfred runtimes or execute the Wilfred verification harness.
+
+This keeps declaration portable while runtime verification remains owned by the runtime that knows how to compose and execute the contribution.
+
 ## Compatibility
 
-Existing tool-only plugins remain valid. `domains` and `capabilities` default to empty tuples, so current plugin factories and current `WilfredRuntime` construction do not need to change merely to keep working.
+Existing Wilfred imports remain valid. `wilfred.DomainDefinition`, `wilfred.CapabilityDefinition`, `wilfred.PluginDefinition` and `wilfred.GoalExpectation` are compatibility facades exposing the exact Butler Core classes.
+
+Existing tool-only plugins remain valid. `domains`, `capabilities` and `verification` default to empty tuples, so current plugin factories and current `WilfredRuntime` construction do not need to change merely to keep working.
 
 A plugin that declares capabilities opts into the semantic ownership contract. It must also declare the corresponding domains it owns.
 
@@ -123,15 +139,20 @@ Existing callers of `WilfredRuntime(resolvers=...)` remain supported. New domain
 
 ## Ownership boundary
 
-The semantic registry belongs to Wilfred and does not duplicate the executable tool registry or introduce Wilfred capability/domain concepts into Butler Core.
+The current separation is:
 
-The current separation remains:
+- **Butler Core** owns provider-neutral declaration and execution contracts, including domain, capability, plugin contribution and goal-expectation value objects;
+- **Wilfred** owns runtime composition, `CapabilityRegistry`, plugin discovery/loading, runtime introspection and executable verification;
+- **plugins/providers** own concrete integration and domain behavior;
+- **frontends** own presentation and provider-specific interaction details.
+
+Conceptually:
 
 - integration/provider: connection to an external service;
-- plugin: packaging and integration boundary;
+- plugin: packaging and contribution boundary;
 - domain: owner of related knowledge and behaviour;
 - capability: something the Butler knows how to do and the deterministic resolvers it owns;
 - tool: typed executable operation;
 - goal: requested outcome.
 
-Butler Core remains provider-neutral and continues to own generic execution and resolution foundations. Wilfred owns the semantic capability/domain model, registry, plugin declaration rules and capability-to-resolver association.
+Butler Core remains provider-neutral. Owning portable contribution declarations does not make Core a plugin runtime: discovery, loading, lifecycle, concrete domain behavior and Wilfred verification stay outside Core.
