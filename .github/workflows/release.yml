@@ -62,15 +62,32 @@ jobs:
           test "$PACKAGE_VERSION" = "$VERSION"
 
           RELEASE_NOTES="docs/releases/${VERSION}.md"
+          RELEASE_BOM="distribution/releases/${VERSION}.toml"
 
           test -s "$RELEASE_NOTES"
           grep -Fq "# Wilfred $VERSION" "$RELEASE_NOTES"
+
+          test -s "$RELEASE_BOM"
+          cmp -s distribution/bom.toml "$RELEASE_BOM"
+
+          python - "$VERSION" "$TAG" "$RELEASE_BOM" <<'PY'
+          import sys
+          import tomllib
+          from pathlib import Path
+
+          version, tag, path = sys.argv[1:]
+          data = tomllib.loads(Path(path).read_text(encoding="utf-8"))
+          assert data["components"]["wilfred"]["version"] == version
+          assert data["release"] == version
+          assert data["source_tag"] == tag
+          PY
 
           git fetch origin main:refs/remotes/origin/main
           git merge-base --is-ancestor HEAD origin/main
 
           echo "RELEASE_VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "RELEASE_NOTES=$RELEASE_NOTES" >> "$GITHUB_ENV"
+          echo "RELEASE_BOM=$RELEASE_BOM" >> "$GITHUB_ENV"
 
       - name: Install build dependencies
         run: |
@@ -129,6 +146,7 @@ jobs:
           gh release create "$GITHUB_REF_NAME" \
             dist/*.whl \
             dist/*.tar.gz \
+            "$RELEASE_BOM#Wilfred $RELEASE_VERSION BOM" \
             --verify-tag \
             --title "Wilfred $GITHUB_REF_NAME" \
             --notes-file "$RELEASE_NOTES"
