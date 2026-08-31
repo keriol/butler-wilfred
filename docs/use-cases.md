@@ -20,17 +20,26 @@ use, and what the capability model is designed to enable.
 
 ## ✅ Available
 
-These foundations are public in Wilfred 0.2.1.
+These foundations are public in Wilfred 0.2.2.
 
 ### Home Assistant connectivity
 
-The official Home Assistant plugin gives Wilfred access to the physical
-smart-home layer.
+The public [Home Assistant Plugin](https://github.com/keriol/home-assistant-plugin)
+connects the Butler ecosystem to the physical smart-home layer.
 
 Home Assistant remains responsible for devices, integrations and physical
 orchestration.
 
 Wilfred does not try to replace it.
+
+The plugin was originally built as a concrete Wilfred proving example. Its
+current development direction is to become a consumer-neutral Butler plugin
+that can be used by more than one sibling runtime through shared Butler Core
+contracts.
+
+That makes Home Assistant an example of the plugin architecture, not a special
+case inside Wilfred. A future integration for another home-automation manager
+can follow the same model with a separate platform plugin.
 
 ### Deterministic resolution
 
@@ -102,6 +111,15 @@ Proactive communication is also being validated as a separate concern.
 The Butler can decide what needs to be communicated without coupling the
 runtime itself to one particular delivery frontend.
 
+### Reusable plugin composition
+
+The Home Assistant Plugin is also being used as a real proving case for a
+stronger plugin boundary: one plugin artifact, shared Core contracts and
+multiple independent Butler runtimes as consumers.
+
+This direction is under active development and is not retroactively part of
+the Wilfred 0.2.2 release contract.
+
 ### What "In testing" means
 
 In testing is not a release promise.
@@ -120,7 +138,7 @@ it may still require:
 
 These examples illustrate where the capability model can go.
 
-They are not claims about features already shipped in Wilfred 0.2.0.
+They are not claims about features already shipped in Wilfred 0.2.2.
 
 ### Energy-aware appliances
 
@@ -159,6 +177,23 @@ an integration handles the actual sensors and irrigation hardware.
 
 The domain knowledge remains separate from the device transport.
 
+### Another home-automation platform
+
+Home Assistant is not an architectural requirement of Wilfred.
+
+A different automation manager can be integrated through its own plugin that
+implements the shared Butler contracts while keeping platform-specific
+authentication, transport and API behavior in that plugin.
+
+Conceptually:
+
+    Butler runtime
+       ├── Home Assistant Plugin -> Home Assistant
+       └── Another Home Plugin   -> another automation platform
+
+The runtime remains focused on composition and capability execution rather than
+learning every platform API itself.
+
 ### Your domain
 
 Wilfred is not limited to smart-home examples.
@@ -182,7 +217,7 @@ The useful question becomes:
 
 ## Public Alpha boundary
 
-Wilfred 0.2.1 provides the public runtime foundations for this model.
+Wilfred 0.2.2 provides the public runtime foundations for this model.
 
 It does not yet provide a complete catalogue of domain capabilities.
 

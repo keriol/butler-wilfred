@@ -87,7 +87,7 @@ class WilfredDocumentationTests(unittest.TestCase):
             "WILFRED_OPENAI_API_KEY",
             "127.0.0.1:8000",
             "0.2.2",
-            "official Home Assistant",
+            "Home Assistant Plugin",
         ):
             self.assertIn(term, guide)
 

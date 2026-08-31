@@ -83,6 +83,11 @@ Before configuring an AI provider, follow the deterministic plugin example in
 That verifies plugin discovery, registration and Execution Engine behaviour
 independently from provider credentials or model behaviour.
 
+The public [Home Assistant Plugin](https://github.com/keriol/home-assistant-plugin)
+is the real smart-home integration used to exercise the same model against an
+external automation platform. It is maintained as its own HAP project rather
+than as a Home Assistant subsystem inside Wilfred.
+
 ## 5. Optional OpenAI BYOK planning
 
 OpenAI support is optional.
@@ -146,8 +151,13 @@ Wilfred `0.2.2` is the current Public Alpha.
 
 The Public Alpha includes the standalone runtime, first-class domain/capability
 composition, deterministic capability-owned resolvers, plugin verification
-contributions, the official Home Assistant plugin integration and the reference
-Docker distribution.
+contributions, the Home Assistant integration used by the reference
+distribution and the reference Docker distribution.
+
+The canonical integration repository is
+[`keriol/home-assistant-plugin`](https://github.com/keriol/home-assistant-plugin).
+Its consumer-neutral HAP migration is active development and is not
+retroactively part of the Wilfred 0.2.2 release contract.
 
 The following remain outside the completed Public Alpha scope:
 - a complete collection of native Butler capabilities;

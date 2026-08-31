@@ -33,9 +33,18 @@ into the conversational layer. Butler Core provides the provider-neutral
 contracts for domains, capabilities and contributions; Wilfred owns discovery,
 loading, aggregation, introspection and runtime composition.
 
-The official Home Assistant plugin, for example, connects Wilfred to the
-physical smart-home layer while Home Assistant remains responsible for devices,
-integrations and physical orchestration.
+The public [Home Assistant Plugin](https://github.com/keriol/home-assistant-plugin)
+is the first real smart-home integration built around this model. It began as a
+concrete proving example for Wilfred and is now evolving into a reusable Butler
+plugin in its own right. Home Assistant remains responsible for devices,
+integrations and physical orchestration; the plugin owns reusable Home
+Assistant integration behaviour; Wilfred remains one consumer of that plugin.
+
+That boundary is deliberate. Home Assistant is not baked into Butler Core and
+is not the only smart-home manager the architecture can support. A future
+integration for another automation platform can be implemented as another
+plugin following the same provider-neutral Butler contracts rather than adding
+platform-specific logic to Wilfred itself.
 
 ## What could you build?
 
@@ -71,7 +80,8 @@ Implemented or actively consolidated in a private real-world Butler deployment,
 but not yet published as reusable Wilfred capabilities.
 
 Current validation areas include richer media behaviour, appliances and
-laundry, and proactive communication.
+laundry, proactive communication and reusable plugin composition across Butler
+runtimes.
 
 **In testing is not a release promise.**
 
@@ -110,7 +120,8 @@ READ → ACTION → READ → VERIFY workflows.
 ### Docker Compose
 
 Docker Compose is the quickest way to run the Wilfred Public Alpha
-with the official Home Assistant plugin.
+with the Home Assistant integration currently included in the reference
+distribution.
 
 ```bash
 git clone https://github.com/keriol/butler-wilfred.git
@@ -202,9 +213,15 @@ It currently provides:
 - clean-room wheel verification as a standalone distribution;
 - public CI coverage reporting;
 - the dependency-free `demo.echo` reference capability plugin;
-- the official public Home Assistant plugin;
+- the public Home Assistant integration currently consumed by the reference distribution;
 - the reference Docker distribution;
 - a version-specific immutable BOM for every public release checkpoint.
+
+The canonical Home Assistant repository is now
+[`keriol/home-assistant-plugin`](https://github.com/keriol/home-assistant-plugin).
+Its ongoing HAP-004 work is moving the plugin from the original Wilfred-coupled
+implementation to a consumer-neutral Butler Core boundary. That direction is
+not retroactively claimed as part of Wilfred 0.2.2.
 
 The Public Alpha does not yet provide generic multi-tool planning chains,
 background workers, schedulers or retry infrastructure.
@@ -230,6 +247,11 @@ any private consumer deployment.
 
 Consumer-specific integrations, infrastructure details, credentials and
 operational configuration belong in separate repositories.
+
+Reusable integrations may also live in independent plugin repositories. The
+Home Assistant Plugin is the first concrete example: a plugin can evolve and be
+consumed independently of Wilfred while still using the same Butler Core
+contracts.
 
 ## Provider-agnostic output
 
