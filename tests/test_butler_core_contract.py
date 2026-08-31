@@ -1,17 +1,27 @@
 from butler_core import (
+    CapabilityDefinition as CoreCapabilityDefinition,
+    DomainDefinition as CoreDomainDefinition,
     ExecutionEngine as CoreExecutionEngine,
     ExecutionRequest as CoreExecutionRequest,
+    GoalExpectation as CoreGoalExpectation,
     OutputAdapter as CoreOutputAdapter,
     OutputDeliveryResult as CoreOutputDeliveryResult,
     OutputDeliveryStatus as CoreOutputDeliveryStatus,
     OutputKind as CoreOutputKind,
     OutputPriority as CoreOutputPriority,
     OutputRequest as CoreOutputRequest,
+    PluginDefinition as CorePluginDefinition,
     ToolDefinition as CoreToolDefinition,
     ToolPermission as CoreToolPermission,
     ToolRegistry as CoreToolRegistry,
 )
 
+from wilfred import (
+    CapabilityDefinition,
+    DomainDefinition,
+    GoalExpectation,
+    PluginDefinition,
+)
 from wilfred.execution import (
     ExecutionEngine,
     ExecutionRequest,
@@ -37,6 +47,12 @@ def test_execution_is_core_contract() -> None:
     assert ExecutionRequest is CoreExecutionRequest
 
 
+def test_semantic_contributions_are_core_contracts() -> None:
+    assert DomainDefinition is CoreDomainDefinition
+    assert CapabilityDefinition is CoreCapabilityDefinition
+    assert PluginDefinition is CorePluginDefinition
+    assert GoalExpectation is CoreGoalExpectation
+
 
 def test_output_is_core_contract() -> None:
     from wilfred.output import (
@@ -54,6 +70,7 @@ def test_output_is_core_contract() -> None:
     assert OutputKind is CoreOutputKind
     assert OutputPriority is CoreOutputPriority
     assert OutputRequest is CoreOutputRequest
+
 
 def test_legacy_wilfred_import_path_still_executes() -> None:
     registry = ToolRegistry()

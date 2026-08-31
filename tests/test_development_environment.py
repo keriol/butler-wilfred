@@ -87,17 +87,13 @@ class DevelopmentEnvironmentTests(unittest.TestCase):
         dependencies = self.load_project()["dependencies"]
 
         self.assertEqual(len(dependencies), 1)
-        self.assertTrue(
-            dependencies[0].startswith(
-                "butler-core @ "
-                "https://github.com/keriol/butler-core/"
-                "releases/download/v0.1.4/"
-                "butler_core-0.1.4-py3-none-any.whl"
-            )
-        )
-        self.assertIn(
-            "#sha256=",
+        self.assertEqual(
             dependencies[0],
+            "butler-core @ "
+            "https://github.com/keriol/butler-core/"
+            "releases/download/v0.2.0/"
+            "butler_core-0.2.0-py3-none-any.whl"
+            "#sha256=40e18d5ef5792c9c5dad807287ae6717e6a0ba0833751503c2ab06c9c2405736",
         )
 
     def test_commands_are_documented(self) -> None:
