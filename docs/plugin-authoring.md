@@ -6,12 +6,19 @@ The built-in `demo.echo` plugin is the reference implementation. It is intention
 
 `provider → plugin → domain → capability → resolver → tool`
 
+The public [Home Assistant Plugin](https://github.com/keriol/home-assistant-plugin)
+is the first real smart-home integration built around this model. It began as a
+concrete Wilfred proving example and is now evolving toward a consumer-neutral
+Butler plugin that can be loaded by independent sibling runtimes. That evolution
+is useful evidence that the plugin contract should describe the integration,
+not bind it permanently to one host runtime.
+
 ## Ownership model
 
 Each layer has one job.
 
 - **Provider / integration** connects to or adapts an external service. In the reference plugin, `EchoProvider` is the provider boundary and `LocalEchoProvider` is the dependency-free example implementation.
-- **Plugin** packages everything that belongs together and declares what it contributes to Wilfred.
+- **Plugin** packages everything that belongs together and declares what it contributes to a Butler runtime.
 - **Domain** owns related knowledge and behavior. The reference plugin declares the `demo` domain.
 - **Capability** names something the Butler knows how to do inside that domain. The reference plugin declares `demo.echo`.
 - **Resolver** deterministically recognizes goals that the capability can handle and produces a normal tool plan. The reference resolver is `demo.echo.text`.
@@ -179,6 +186,7 @@ Keep these boundaries stable when creating a real plugin:
 7. Declare representative deterministic expectations instead of embedding test-framework execution in plugin import paths.
 8. Keep frontend presentation and provider-specific rendering outside Butler Core.
 9. Do not put secrets, private endpoints or deployment-specific identifiers in public plugin metadata or verification declarations.
+10. Keep the plugin dependent on provider-neutral Butler contracts where possible rather than on one sibling runtime merely because that runtime was its first consumer.
 
 ## Testing a plugin
 
@@ -202,6 +210,24 @@ Replace `LocalEchoProvider` with a provider adapter that owns the actual externa
 
 `external service → provider adapter → plugin package → domain/capability → resolver → typed tool → Execution Engine`
 
-The Home Assistant plugin is a real consumer of the same public model, but it is intentionally not used as the authoring example so the reference remains small, installable and independent of any particular home-automation platform.
+The Home Assistant Plugin is a real consumer of the same public model, but it is intentionally not used as the small authoring example so the reference remains installable and independent of any particular home-automation platform.
+
+The architectural lesson from HAP is broader than Home Assistant. If a user wants to integrate another home-automation manager, the preferred direction is another dedicated plugin:
+
+```text
+Butler runtime
+    |
+    +-> Home Assistant Plugin -> Home Assistant
+    |
+    +-> Platform X Plugin     -> Platform X
+```
+
+Each platform plugin owns its authentication, transport and platform-specific
+operations. Butler Core stays provider-neutral, and the host runtime does not
+need platform-specific device APIs baked into its own code.
+
+HAP is currently being migrated toward that fully consumer-neutral boundary.
+Do not infer completed dependency changes from this design note; use the HAP
+repository and GitHub Issues for current implementation evidence.
 
 For the detailed semantic contracts and deterministic ordering rules, see [Capability and domain contracts](capability-domain-contracts.md).
