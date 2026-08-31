@@ -14,8 +14,8 @@ class PublicAIDeveloperModelTests(unittest.TestCase):
         text = MODEL.read_text(encoding="utf-8")
 
         for term in (
-            "Wilfred `0.2.1`",
-            "Butler Core `0.1.4`",
+            "Wilfred `0.2.2`",
+            "Butler Core `0.2.0`",
             "GitHub Issues",
             "deterministic request resolution",
             "optional planner fallback",
@@ -23,6 +23,7 @@ class PublicAIDeveloperModelTests(unittest.TestCase):
             "WilfredRuntime",
             "READ → ACTION → READ → VERIFY",
             "official public Home Assistant plugin",
+            "version-specific release BOM",
         ):
             self.assertIn(term, text)
 

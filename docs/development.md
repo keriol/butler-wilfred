@@ -32,11 +32,37 @@ public distribution works without another butler repository.
 
 Wilfred `0.2.0` established the Public Alpha baseline.
 
-The current release baseline is `0.2.1`.
+The current release baseline is `0.2.2`.
 
 Development versions are working lines, not release promises. A new public
 version is opened or released only when accumulated coherent value justifies
 another public checkpoint.
+
+A change to a release-contract dependency requires a new Wilfred semantic
+version. When public compatibility is preserved, that means at least a patch
+bump. A released `x.y.z` must never silently acquire a different dependency
+baseline.
+
+## Release BOM discipline
+
+`distribution/bom.toml` describes the dependency baseline of the current
+release checkpoint.
+
+Every stable release also owns an immutable snapshot at:
+
+`distribution/releases/<version>.toml`
+
+At release time the current BOM and versioned snapshot must be byte-identical.
+The release workflow validates the snapshot against the package version and tag
+and publishes it as a GitHub Release asset beside the wheel and source
+distribution.
+
+The BOM records exact release-contract dependencies. For Wilfred 0.2.2 this
+includes the immutable Butler Core 0.2.0 wheel and SHA256 plus the exact Home
+Assistant plugin commit embedded by the reference Docker distribution.
+
+Historical BOM snapshots are retained rather than rewritten when a later
+release changes dependencies.
 
 ## Native capabilities
 
@@ -68,17 +94,16 @@ standalone bootstrap behavior.
 ### Automated releases
 
 Stable Wilfred releases are published from immutable semantic-version
-tags such as `v0.1.7`.
+tags such as `v0.2.2`.
 
 The release workflow verifies that the tag and package version match,
-that the tagged commit belongs to `main`, and that the public test
-suite passes. It then builds wheel and source distributions, verifies
-the wheel in a clean virtual environment, checks package dependencies
-and CLI entry points, and finally publishes the artifacts as a GitHub
-Release.
+that the tagged commit belongs to `main`, that the version-specific BOM matches
+the current distribution BOM, and that the public test suite passes. It then
+builds wheel and source distributions, verifies the wheel in a clean virtual
+environment, checks package dependencies and CLI entry points, and finally
+publishes the artifacts plus the release BOM as a GitHub Release.
 
-Development versions such as `0.1.7.dev0` therefore cannot be
-published using a stable `v0.1.7` tag.
+Development versions therefore cannot be published using a stable release tag.
 
 ### Versioned release notes
 

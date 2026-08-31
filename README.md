@@ -28,8 +28,10 @@ Wilfred separates a few concepts deliberately:
 - a **domain** groups related knowledge and behaviour;
 - a **goal** describes the outcome the user wants.
 
-Plugins can package the tools and domain behaviour needed to add new
-capabilities without pushing that knowledge into the conversational layer.
+Plugins can package tools and domain behaviour without pushing that knowledge
+into the conversational layer. Butler Core provides the provider-neutral
+contracts for domains, capabilities and contributions; Wilfred owns discovery,
+loading, aggregation, introspection and runtime composition.
 
 The official Home Assistant plugin, for example, connects Wilfred to the
 physical smart-home layer while Home Assistant remains responsible for devices,
@@ -50,7 +52,7 @@ The point is not to create one automation for every possible request. Each
 domain contributes the knowledge it owns.
 
 These examples do not mean that every domain already exists publicly in
-Wilfred 0.2.0.
+Wilfred 0.2.2.
 
 ## Capability maturity
 
@@ -60,8 +62,8 @@ Wilfred uses three maturity labels for public features and capability examples.
 
 Public, documented and usable today.
 
-Wilfred 0.2.0 ships the runtime foundation and official Home Assistant bridge
-described in [Current Public Alpha](#current-public-alpha).
+Wilfred 0.2.2 ships the capability-first Public Alpha foundation described in
+[Current Public Alpha](#current-public-alpha).
 
 ### 🧪 In testing
 
@@ -86,6 +88,10 @@ and examples.
 
 Known requests can be resolved deterministically first. More open-ended goals
 can optionally fall back to a planner.
+
+Capabilities may own their deterministic resolvers. Plugins may also declare
+deterministic verification expectations that Wilfred executes through the
+normal runtime path.
 
 Planning does not bypass execution policy. Permissions, confirmation and
 validation remain runtime responsibilities.
@@ -160,6 +166,10 @@ python -m pip install -e ".[dev]"
 See [`docs/installation.md`](docs/installation.md) and
 [`docs/onboarding.md`](docs/onboarding.md) for the complete native setup.
 
+See [`docs/capability-domain-contracts.md`](docs/capability-domain-contracts.md)
+and [`docs/plugin-authoring.md`](docs/plugin-authoring.md) for capability-first
+plugin authoring and ownership boundaries.
+
 See [`docs/execution-engine.md`](docs/execution-engine.md) for validation,
 permissions, confirmations, timeouts and structured execution results.
 
@@ -168,15 +178,20 @@ endpoints and security boundary.
 
 ## Current Public Alpha
 
-Wilfred `0.2.1` is the current Public Alpha.
+Wilfred `0.2.2` is the current Public Alpha.
 
 It currently provides:
 
 - a standalone public runtime;
 - autonomous identity and configuration;
-- public tool and plugin contracts;
-- shared tool, registry, execution and deterministic resolution contracts from Butler Core 0.1.4;
+- public tool and plugin compatibility surfaces;
+- Butler Core 0.2.0 as the immutable provider-neutral contract baseline;
+- Core-owned domain, capability, plugin/contribution and goal-expectation contracts;
 - deterministic plugin loading;
+- a Wilfred-owned capability registry and runtime introspection;
+- capability-owned deterministic resolvers before planner fallback;
+- CLI and HTTP domain/capability discovery;
+- plugin-declared deterministic verification contributions;
 - an Execution Engine facade backed by Butler Core;
 - provider-neutral planned execution backed by Butler Core;
 - a public goal-oriented `WilfredRuntime` composition API;
@@ -185,8 +200,11 @@ It currently provides:
 - an optional OpenAI BYOK planner provider;
 - provider-agnostic READ-ACTION-VERIFY workflows;
 - clean-room wheel verification as a standalone distribution;
+- public CI coverage reporting;
+- the dependency-free `demo.echo` reference capability plugin;
 - the official public Home Assistant plugin;
-- the reference Docker distribution.
+- the reference Docker distribution;
+- a version-specific immutable BOM for every public release checkpoint.
 
 The Public Alpha does not yet provide generic multi-tool planning chains,
 background workers, schedulers or retry infrastructure.
@@ -195,9 +213,8 @@ Its runtime, APIs and plugin contracts may continue to evolve, and
 compatibility guarantees remain more limited than they will be for a stable
 release.
 
-See [`docs/execution-engine.md`](docs/execution-engine.md) for execution
-semantics and [`docs/http-api.md`](docs/http-api.md) for the optional HTTP
-transport.
+See [`docs/releases/0.2.2.md`](docs/releases/0.2.2.md) for the release scope and
+`distribution/releases/0.2.2.toml` for the exact dependency baseline.
 
 If Wilfred is useful to you and you would like to support its continued
 development, you can [support Wilfred on Ko-fi](https://ko-fi.com/butlerwilfred).

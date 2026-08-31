@@ -19,8 +19,8 @@ Use sources in this order for the kind of information they own:
   public software and its architectural contracts.
 - **GitHub Issues** describe active work, task status, priorities,
   dependencies, and planned changes.
-- **GitHub Releases and versioned release notes** describe published
-  checkpoints and release artifacts.
+- **GitHub Releases, versioned release notes, and per-release BOMs** describe
+  published checkpoints, dependency baselines, and release artifacts.
 
 Do not infer current task state from this file.
 
@@ -29,16 +29,20 @@ feature is already implemented.
 
 ## Current public baseline
 
-Wilfred `0.2.1` is the current Public Alpha.
+Wilfred `0.2.2` is the current Public Alpha.
 
 The current runtime includes:
 
 - a standalone Python runtime and configuration model;
-- public tool and plugin contracts;
-- Butler Core `0.1.4` as the provider-neutral execution foundation;
+- public tool and plugin compatibility surfaces;
+- Butler Core `0.2.0` as the provider-neutral contract and execution foundation;
+- Core-owned domain, capability, plugin/contribution and goal-expectation declarations;
 - deterministic plugin loading;
+- a Wilfred-owned semantic capability registry and runtime introspection;
+- capability-owned deterministic request resolution before optional planner fallback;
+- CLI and optional HTTP capability/domain discovery;
+- plugin-declared deterministic verification contributions and a Wilfred verification harness;
 - the shared tool registry and Execution Engine contracts;
-- deterministic request resolution before planner fallback;
 - provider-neutral planned execution;
 - `WilfredRuntime` goal execution;
 - a goal-oriented CLI;
@@ -50,7 +54,8 @@ The current runtime includes:
 - reusable pending-action lifecycle support;
 - provider-latency acknowledgement support;
 - standalone wheel and container distribution;
-- the official public Home Assistant plugin as an external integration.
+- the official public Home Assistant plugin as an external integration;
+- a version-specific release BOM for each public checkpoint.
 
 When documentation and runtime code disagree, inspect current tests and code
 before changing the model.
@@ -65,7 +70,13 @@ The public dependency direction is:
 
 Butler Core owns reusable provider-neutral execution foundations and contracts.
 
-Wilfred consumes those contracts rather than duplicating them.
+Wilfred consumes those contracts rather than duplicating them. In 0.2.2 this
+includes the public domain, capability, plugin/contribution and goal-expectation
+value contracts as exact Core classes.
+
+Core does not own Wilfred plugin discovery/loading, capability aggregation,
+runtime composition, executable verification, transports or provider-specific
+behavior.
 
 Do not move service-specific behavior, presentation behavior, or application
 domain knowledge into Butler Core.
@@ -76,11 +87,14 @@ Wilfred owns public Butler runtime composition.
 
 Its responsibilities include:
 
-- loading plugins;
+- discovering and loading plugins;
 - composing registered tools;
-- resolving known requests deterministically;
+- aggregating domain and capability declarations;
+- exposing deterministic semantic introspection;
+- composing capability-owned deterministic resolvers;
 - falling back to planning when appropriate;
 - applying execution policy;
+- executing plugin-declared verification expectations through the normal runtime path;
 - coordinating goals and workflows;
 - exposing public CLI and HTTP transports.
 
@@ -89,10 +103,13 @@ Transport layers do not become alternate orchestration cores.
 ### Plugins
 
 Plugins connect external integrations to the Wilfred runtime and register
-public executable behavior through Wilfred's plugin and tool contracts.
+public executable behavior through shared Core declarations and Wilfred runtime
+loading surfaces.
 
-Plugin-specific knowledge stays with the plugin rather than entering generic
-conversation or execution infrastructure.
+A plugin may declare domains, capabilities, capability-owned resolvers, tools
+and deterministic verification expectations. Plugin-specific knowledge stays
+with the plugin rather than entering generic conversation or execution
+infrastructure.
 
 ## Resolution and execution
 
@@ -113,6 +130,34 @@ Where success can be observed, use:
 `READ → ACTION → READ → VERIFY`
 
 Dispatch alone is not proof that the requested external state was reached.
+
+## Verification contributions
+
+Plugins may declare immutable deterministic goal expectations beside their
+runtime contributions.
+
+Declarations do not execute tests at import time. Wilfred owns the executable
+verification harness, which runs expectations through `WilfredRuntime` and the
+normal resolution/execution path.
+
+Frontend-specific regression concepts remain owned by the frontend that needs
+them and do not become generic Butler Core concepts merely because the shared
+verification pattern exists.
+
+## Release and BOM discipline
+
+Every released Wilfred version has its own immutable dependency baseline.
+
+`distribution/bom.toml` represents the current release baseline and must match
+the version-specific snapshot under `distribution/releases/<version>.toml` at
+release time.
+
+The release workflow publishes that version-specific BOM beside the wheel and
+source distribution.
+
+If a release-contract dependency changes, Wilfred must publish a new semantic
+version rather than silently changing what an existing `x.y.z` means. A
+compatible dependency-baseline change requires at least a patch bump.
 
 ## AI provider boundary
 

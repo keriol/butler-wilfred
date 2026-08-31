@@ -5,7 +5,7 @@ services:
       args:
         WILFRED_HOME_ASSISTANT_REF: "${WILFRED_HOME_ASSISTANT_REF:-60882a1efba3c3a248047ff69c8ca83352263da7}"
 
-    image: "${WILFRED_IMAGE:-wilfred:0.2.0-dev}"
+    image: "${WILFRED_IMAGE:-wilfred:0.2.2}"
 
     init: true
     restart: unless-stopped

@@ -88,9 +88,10 @@ Provider-agnostic READ-ACTION-VERIFY workflows build on it without
 redefining Execution Engine `success` as proof of external state change.
 See [Verified workflows](verified-workflows.md).
 
-Native capabilities, verified workflows and local workflow persistence are
-available. Goal APIs, the official Home Assistant plugin and the Wilfred
-`0.2.1` Public Alpha are part of the current public surface.
+Native capabilities, capability-owned deterministic resolvers, plugin
+verification contributions, verified workflows and local workflow persistence
+are available. Goal APIs, the official Home Assistant plugin and the Wilfred
+`0.2.2` Public Alpha are part of the current public surface.
 
 Additional native capabilities and further Public Alpha hardening remain
 under active development.
