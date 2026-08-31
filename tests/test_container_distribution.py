@@ -34,6 +34,7 @@ def test_compose_keeps_runtime_hardened() -> None:
         "wilfred_home_assistant.bootstrap:"
         "create_plugin_from_environment"
     ) in compose
+    assert "wilfred:0.2.2" in compose
 
 
 def test_reference_binding_is_loopback_only() -> None:
@@ -46,19 +47,30 @@ def test_reference_binding_is_loopback_only() -> None:
 
 
 def test_distribution_bom_matches_release_baseline() -> None:
-    with (
-        ROOT / "distribution" / "bom.toml"
-    ).open("rb") as stream:
+    current_path = ROOT / "distribution" / "bom.toml"
+    snapshot_path = (
+        ROOT / "distribution" / "releases" / "0.2.2.toml"
+    )
+
+    assert current_path.read_bytes() == snapshot_path.read_bytes()
+
+    with current_path.open("rb") as stream:
         bom = tomllib.load(stream)
 
-    assert bom["schema_version"] == 1
+    assert bom["schema_version"] == 2
+    assert bom["release"] == "0.2.2"
+    assert bom["source_tag"] == "v0.2.2"
     assert (
         bom["components"]["butler_core"]["version"]
-        == "0.1.4"
+        == "0.2.0"
+    )
+    assert (
+        bom["components"]["butler_core"]["sha256"]
+        == "40e18d5ef5792c9c5dad807287ae6717e6a0ba0833751503c2ab06c9c2405736"
     )
     assert (
         bom["components"]["wilfred"]["version"]
-        == "0.2.1"
+        == "0.2.2"
     )
     assert (
         bom["components"]["home_assistant"]["version"]
@@ -72,6 +84,24 @@ def test_distribution_bom_matches_release_baseline() -> None:
     assert len(plugin_ref) == 40
     int(plugin_ref, 16)
 
+    assert bom["release_scope"]["base_tag"] == "v0.2.1"
+    assert "WILF-063" in bom["release_scope"]["issues"]
+    assert "WILF-064" in bom["release_scope"]["issues"]
+
+
+def test_previous_release_bom_snapshots_are_preserved() -> None:
+    releases = ROOT / "distribution" / "releases"
+
+    with (releases / "0.2.0.toml").open("rb") as stream:
+        bom_020 = tomllib.load(stream)
+    with (releases / "0.2.1.toml").open("rb") as stream:
+        bom_021 = tomllib.load(stream)
+
+    assert bom_020["components"]["wilfred"]["version"] == "0.2.0"
+    assert bom_020["components"]["butler_core"]["version"] == "0.1.3"
+    assert bom_021["components"]["wilfred"]["version"] == "0.2.1"
+    assert bom_021["components"]["butler_core"]["version"] == "0.1.4"
+
 
 def test_examples_contain_no_credentials() -> None:
     env_example = read(
@@ -80,6 +110,7 @@ def test_examples_contain_no_credentials() -> None:
 
     assert "WILFRED_OPENAI_API_KEY=\n" in env_example
     assert "WILFRED_HOME_ASSISTANT_TOKEN=\n" in env_example
+
 
 def test_runtime_checkout_is_reusable() -> None:
     checkout = ROOT / "distribution" / "verify_runtime.py"
@@ -106,4 +137,3 @@ def test_container_ci_verifies_registry_pull() -> None:
     assert "docker image rm" in workflow
     assert "docker pull" in workflow
     assert "verify_runtime.py" in workflow
-
