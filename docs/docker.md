@@ -3,13 +3,20 @@
 Wilfred can run as a standalone container while integrations remain external
 plugin packages.
 
-The official Public Alpha composition currently contains:
+The current Public Alpha reference composition contains:
 
 - Wilfred standalone runtime;
 - Butler Core through Wilfred's package dependency;
-- the official Home Assistant plugin;
+- the Home Assistant integration from the public Home Assistant Plugin project;
 - the optional Wilfred HTTP transport;
 - the optional OpenAI planner provider.
+
+The canonical Home Assistant integration repository is
+[`keriol/home-assistant-plugin`](https://github.com/keriol/home-assistant-plugin).
+The plugin was originally composed as a Wilfred-specific dependency and is now
+being migrated under HAP-004 toward a consumer-neutral Butler Core boundary.
+Historical Wilfred release BOMs remain authoritative for the exact dependency
+that each released image actually contained.
 
 Home Assistant itself is not installed inside the Wilfred container.
 
@@ -75,12 +82,14 @@ not require mounting the host Docker socket into the Wilfred runtime.
 
 ## Compatibility
 
-`distribution/bom.toml` is the compatibility snapshot for this development
-distribution.
+`distribution/bom.toml` is the compatibility snapshot for the current
+development distribution. Version-specific files under
+`distribution/releases/` are immutable release evidence and may legitimately
+retain the historical repository/package identity used by that release.
 
-The Home Assistant plugin is pinned to an immutable public Git revision during
-the 0.2.0 development cycle. Stable package and image references are finalized
-as part of the 0.2.0 release choreography.
+Do not infer the active HAP-004 consumer-neutral migration from an older Wilfred
+BOM. A future Wilfred release adopts a new HAP dependency baseline only through
+explicit release scope and evidence.
 
 ## Container artifact checkout
 
