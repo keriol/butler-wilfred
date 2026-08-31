@@ -50,7 +50,7 @@ class WilfredDocumentationTests(unittest.TestCase):
             len(set(h2_headings)),
         )
         self.assertIn(
-            "Wilfred `0.2.1` is the current Public Alpha",
+            "Wilfred `0.2.2` is the current Public Alpha",
             readme,
         )
         self.assertIn(
@@ -86,7 +86,7 @@ class WilfredDocumentationTests(unittest.TestCase):
             "demo.echo",
             "WILFRED_OPENAI_API_KEY",
             "127.0.0.1:8000",
-            "0.2.1",
+            "0.2.2",
             "official Home Assistant",
         ):
             self.assertIn(term, guide)
@@ -196,7 +196,7 @@ class WilfredDocumentationTests(unittest.TestCase):
         normalized = " ".join(guide.split())
 
         self.assertIn(
-            "Wilfred `0.2.1` Public Alpha",
+            "Wilfred `0.2.2` Public Alpha",
             normalized,
         )
         self.assertIn(
@@ -219,8 +219,6 @@ class WilfredDocumentationTests(unittest.TestCase):
             'tool_name="example_tool"',
             guide,
         )
-
-
 
     def test_verified_workflow_guide_documents_contract(self) -> None:
         guide = (
@@ -247,8 +245,6 @@ class WilfredDocumentationTests(unittest.TestCase):
             "Automatic ACTION retries are deliberately outside",
             normalized,
         )
-
-
 
     def test_persistence_guide_documents_contract(self) -> None:
         guide = (
