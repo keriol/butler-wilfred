@@ -84,16 +84,16 @@ class DevelopmentEnvironmentTests(unittest.TestCase):
         self.assertNotIn("uvicorn", runtime_names)
 
     def test_runtime_dependency_is_butler_core(self) -> None:
-        dependencies = self.load_project()["dependencies"]
+        project = self.load_project()
+        dependencies = project["dependencies"]
 
+        self.assertEqual(project["version"], "0.2.3.dev0")
         self.assertEqual(len(dependencies), 1)
         self.assertEqual(
             dependencies[0],
             "butler-core @ "
-            "https://github.com/keriol/butler-core/"
-            "releases/download/v0.2.0/"
-            "butler_core-0.2.0-py3-none-any.whl"
-            "#sha256=40e18d5ef5792c9c5dad807287ae6717e6a0ba0833751503c2ab06c9c2405736",
+            "https://github.com/keriol/butler-core/archive/"
+            "827bbac1038b6591f88648e5b69e50ae66834c19.tar.gz",
         )
 
     def test_commands_are_documented(self) -> None:
