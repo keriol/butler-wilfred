@@ -12,6 +12,11 @@ import zipfile
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+CORE_REF = "827bbac1038b6591f88648e5b69e50ae66834c19"
+CORE_ARCHIVE = (
+    "https://github.com/keriol/butler-core/archive/"
+    f"{CORE_REF}.tar.gz"
+)
 
 
 def _venv_executable(
@@ -43,11 +48,14 @@ def _run(
 
 class WilfredCleanRoomDistributionTests(unittest.TestCase):
     def test_wheel_runs_as_standalone_distribution(self) -> None:
-        environment = os.environ.copy()
-        environment.pop("PYTHONPATH", None)
-        environment.pop("PYTHONHOME", None)
-        environment["PIP_DISABLE_PIP_VERSION_CHECK"] = "1"
-        environment["PIP_NO_INDEX"] = "1"
+        build_environment = os.environ.copy()
+        build_environment.pop("PYTHONPATH", None)
+        build_environment.pop("PYTHONHOME", None)
+        build_environment.pop("PIP_NO_INDEX", None)
+        build_environment["PIP_DISABLE_PIP_VERSION_CHECK"] = "1"
+
+        offline_environment = build_environment.copy()
+        offline_environment["PIP_NO_INDEX"] = "1"
 
         with tempfile.TemporaryDirectory(
             prefix="wilfred-clean-room-",
@@ -65,13 +73,35 @@ class WilfredCleanRoomDistributionTests(unittest.TestCase):
                     "pip",
                     "wheel",
                     "--no-deps",
+                    "--wheel-dir",
+                    str(wheelhouse),
+                    CORE_ARCHIVE,
+                ],
+                cwd=lab,
+                environment=build_environment,
+            )
+
+            core_wheels = list(
+                wheelhouse.glob("butler_core-*.whl")
+            )
+            self.assertEqual(len(core_wheels), 1)
+            core_wheel = core_wheels[0]
+            self.assertIn("0.2.1.dev0", core_wheel.name)
+
+            _run(
+                [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "wheel",
+                    "--no-deps",
                     "--no-build-isolation",
                     "--wheel-dir",
                     str(wheelhouse),
                     str(PROJECT_ROOT),
                 ],
                 cwd=lab,
-                environment=environment,
+                environment=build_environment,
             )
 
             wheels = list(
@@ -106,7 +136,7 @@ class WilfredCleanRoomDistributionTests(unittest.TestCase):
                     str(virtualenv),
                 ],
                 cwd=lab,
-                environment=environment,
+                environment=build_environment,
             )
 
             clean_python = _venv_executable(
@@ -125,10 +155,35 @@ class WilfredCleanRoomDistributionTests(unittest.TestCase):
                     "pip",
                     "install",
                     "--no-index",
+                    str(core_wheel),
+                ],
+                cwd=lab,
+                environment=offline_environment,
+            )
+
+            _run(
+                [
+                    str(clean_python),
+                    "-m",
+                    "pip",
+                    "install",
+                    "--no-index",
+                    "--no-deps",
                     str(wheel),
                 ],
                 cwd=lab,
-                environment=environment,
+                environment=offline_environment,
+            )
+
+            _run(
+                [
+                    str(clean_python),
+                    "-m",
+                    "pip",
+                    "check",
+                ],
+                cwd=lab,
+                environment=offline_environment,
             )
 
             script = """
@@ -248,7 +303,7 @@ print(
                     script,
                 ],
                 cwd=lab,
-                environment=environment,
+                environment=offline_environment,
             )
 
             payload = json.loads(
@@ -278,7 +333,7 @@ print(
             entrypoint = _run(
                 [str(clean_wilfred)],
                 cwd=lab,
-                environment=environment,
+                environment=offline_environment,
             )
 
             status = json.loads(
@@ -305,7 +360,7 @@ print(
                     "--help",
                 ],
                 cwd=lab,
-                environment=environment,
+                environment=offline_environment,
             )
 
             self.assertIn(

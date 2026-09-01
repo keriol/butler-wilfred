@@ -3,9 +3,9 @@ services:
     build:
       context: .
       args:
-        WILFRED_HOME_ASSISTANT_REF: "${WILFRED_HOME_ASSISTANT_REF:-60882a1efba3c3a248047ff69c8ca83352263da7}"
+        HAP_REF: "${HAP_REF:-d1856791b887c36e54c71fe3e81646f969249885}"
 
-    image: "${WILFRED_IMAGE:-wilfred:0.2.2}"
+    image: "${WILFRED_IMAGE:-wilfred:0.2.3.dev0}"
 
     init: true
     restart: unless-stopped
