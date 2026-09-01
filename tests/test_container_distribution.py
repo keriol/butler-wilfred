@@ -21,6 +21,21 @@ def test_dockerfile_uses_non_root_runtime() -> None:
     assert "/var/run/docker.sock" not in dockerfile
 
 
+def test_development_line_consumes_independent_hap() -> None:
+    pyproject = read("pyproject.toml")
+    dockerfile = read("Dockerfile")
+
+    assert 'version = "0.2.3.dev0"' in pyproject
+    assert (
+        "827bbac1038b6591f88648e5b69e50ae66834c19"
+        in pyproject
+    )
+    assert "butler-home-assistant" in dockerfile
+    assert "home-assistant-plugin/archive/${HAP_REF}.tar.gz" in dockerfile
+    assert "wilfred-home-assistant @" not in dockerfile
+    assert "ARG HAP_REF=d1856791b887c36e54c71fe3e81646f969249885" in dockerfile
+
+
 def test_compose_keeps_runtime_hardened() -> None:
     compose = read("compose.yaml")
 
@@ -34,7 +49,8 @@ def test_compose_keeps_runtime_hardened() -> None:
         "wilfred_home_assistant.bootstrap:"
         "create_plugin_from_environment"
     ) in compose
-    assert "wilfred:0.2.2" in compose
+    assert "wilfred:0.2.3.dev0" in compose
+    assert "HAP_REF" in compose
 
 
 def test_reference_binding_is_loopback_only() -> None:
@@ -137,3 +153,4 @@ def test_container_ci_verifies_registry_pull() -> None:
     assert "docker image rm" in workflow
     assert "docker pull" in workflow
     assert "verify_runtime.py" in workflow
+    assert "HAP_REF=d1856791b887c36e54c71fe3e81646f969249885" in workflow
