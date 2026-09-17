@@ -35,10 +35,10 @@ loading, aggregation, introspection and runtime composition.
 
 The public [Home Assistant Plugin](https://github.com/keriol/home-assistant-plugin)
 is the first real smart-home integration built around this model. It began as a
-concrete proving example for Wilfred and is now evolving into a reusable Butler
-plugin in its own right. Home Assistant remains responsible for devices,
-integrations and physical orchestration; the plugin owns reusable Home
-Assistant integration behaviour; Wilfred remains one consumer of that plugin.
+concrete proving example for Wilfred and now exists as an independent reusable
+Butler plugin built on Butler Core contracts. Home Assistant remains responsible
+for devices, integrations and physical orchestration; the plugin owns reusable
+Home Assistant integration behaviour; Wilfred is one consumer of that plugin.
 
 That boundary is deliberate. Home Assistant is not baked into Butler Core and
 is not the only smart-home manager the architecture can support. A future
