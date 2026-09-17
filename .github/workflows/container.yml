@@ -35,7 +35,7 @@ jobs:
       - name: Build image
         run: |
           docker build \
-            --build-arg HAP_REF=d1856791b887c36e54c71fe3e81646f969249885 \
+            --build-arg HAP_REF=d14f404fb2833900d34270f2cc1cb53b5fec2590 \
             --tag wilfred:ci \
             .
 
