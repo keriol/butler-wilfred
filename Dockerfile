@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 
-ARG HAP_REF=d1856791b887c36e54c71fe3e81646f969249885
+ARG HAP_REF=d14f404fb2833900d34270f2cc1cb53b5fec2590
 
 LABEL org.opencontainers.image.title="Wilfred"
 LABEL org.opencontainers.image.description="Standalone public Wilfred Butler runtime"
@@ -18,7 +18,7 @@ RUN groupadd --system wilfred     && useradd         --system         --gid wilf
 COPY pyproject.toml README.md LICENSE ./
 COPY src ./src
 
-RUN python -m pip install         --no-cache-dir         --upgrade         pip         setuptools         wheel     && python -m pip install         --no-cache-dir         ".[http,openai]"     && python -m pip install         --no-cache-dir         "httpx>=0.28,<1"     && python -m pip install         --no-cache-dir         --no-deps         "butler-home-assistant @ https://github.com/keriol/home-assistant-plugin/archive/${HAP_REF}.tar.gz"     && python -m pip check
+RUN python -m pip install         --no-cache-dir         --upgrade         pip         setuptools         wheel     && python -m pip install         --no-cache-dir         ".[http,openai]"     && python -m pip install         --no-cache-dir         "httpx>=0.28,<1"         "websockets>=15,<17"     && python -m pip install         --no-cache-dir         --no-deps         "butler-home-assistant @ https://github.com/keriol/home-assistant-plugin/archive/${HAP_REF}.tar.gz"     && python -m pip check
 
 USER wilfred
 
