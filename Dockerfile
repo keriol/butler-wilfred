@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 
-ARG HAP_REF=d1856791b887c36e54c71fe3e81646f969249885
+ARG HAP_REF=d14f404fb2833900d34270f2cc1cb53b5fec2590
 
 LABEL org.opencontainers.image.title="Wilfred"
 LABEL org.opencontainers.image.description="Standalone public Wilfred Butler runtime"
