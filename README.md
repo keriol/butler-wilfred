@@ -217,11 +217,13 @@ It currently provides:
 - the reference Docker distribution;
 - a version-specific immutable BOM for every public release checkpoint.
 
-The canonical Home Assistant repository is now
+The canonical Home Assistant repository is
 [`keriol/home-assistant-plugin`](https://github.com/keriol/home-assistant-plugin).
-Its ongoing HAP-004 work is moving the plugin from the original Wilfred-coupled
-implementation to a consumer-neutral Butler Core boundary. That direction is
-not retroactively claimed as part of Wilfred 0.2.2.
+HAP-004 completed the move from the original Wilfred-coupled implementation to
+a consumer-neutral Butler Core boundary, and WILF-065 proved that Wilfred can
+consume the independent HAP development artifact through its existing runtime
+composition. Those post-release development changes are not retroactively
+claimed as part of the immutable Wilfred 0.2.2 release baseline.
 
 The Public Alpha does not yet provide generic multi-tool planning chains,
 background workers, schedulers or retry infrastructure.
