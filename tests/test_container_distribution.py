@@ -33,7 +33,7 @@ def test_development_line_consumes_independent_hap() -> None:
     assert "butler-home-assistant" in dockerfile
     assert "home-assistant-plugin/archive/${HAP_REF}.tar.gz" in dockerfile
     assert "wilfred-home-assistant @" not in dockerfile
-    assert "ARG HAP_REF=d1856791b887c36e54c71fe3e81646f969249885" in dockerfile
+    assert "ARG HAP_REF=d14f404fb2833900d34270f2cc1cb53b5fec2590" in dockerfile
 
 
 def test_compose_keeps_runtime_hardened() -> None:
@@ -51,6 +51,7 @@ def test_compose_keeps_runtime_hardened() -> None:
     ) in compose
     assert "wilfred:0.2.3.dev0" in compose
     assert "HAP_REF" in compose
+    assert "d14f404fb2833900d34270f2cc1cb53b5fec2590" in compose
 
 
 def test_reference_binding_is_loopback_only() -> None:
@@ -153,4 +154,4 @@ def test_container_ci_verifies_registry_pull() -> None:
     assert "docker image rm" in workflow
     assert "docker pull" in workflow
     assert "verify_runtime.py" in workflow
-    assert "HAP_REF=d1856791b887c36e54c71fe3e81646f969249885" in workflow
+    assert "HAP_REF=d14f404fb2833900d34270f2cc1cb53b5fec2590" in workflow
