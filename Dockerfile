@@ -18,7 +18,7 @@ RUN groupadd --system wilfred     && useradd         --system         --gid wilf
 COPY pyproject.toml README.md LICENSE ./
 COPY src ./src
 
-RUN python -m pip install         --no-cache-dir         --upgrade         pip         setuptools         wheel     && python -m pip install         --no-cache-dir         ".[http,openai]"     && python -m pip install         --no-cache-dir         "httpx>=0.28,<1"     && python -m pip install         --no-cache-dir         --no-deps         "butler-home-assistant @ https://github.com/keriol/home-assistant-plugin/archive/${HAP_REF}.tar.gz"     && python -m pip check
+RUN python -m pip install         --no-cache-dir         --upgrade         pip         setuptools         wheel     && python -m pip install         --no-cache-dir         ".[http,openai]"     && python -m pip install         --no-cache-dir         "httpx>=0.28,<1"         "websockets>=15,<17"     && python -m pip install         --no-cache-dir         --no-deps         "butler-home-assistant @ https://github.com/keriol/home-assistant-plugin/archive/${HAP_REF}.tar.gz"     && python -m pip check
 
 USER wilfred
 
