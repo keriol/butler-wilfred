@@ -146,7 +146,7 @@ class PlannedExecution:
             ExecutionRequest(
                 tool_name=plan.tool_name,
                 arguments=plan.arguments,
-                confirmed=confirmed,
+                confirmed=(confirmed or plan.user_authorized),
             )
         )
 

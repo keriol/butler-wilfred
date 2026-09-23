@@ -16,7 +16,12 @@ from wilfred.models import ToolDefinition, ToolPermission
 from wilfred.plugins import PluginDefinition
 
 
-def _plan(tool_name: str, reason: str) -> PlannerResult:
+def _plan(
+    tool_name: str,
+    reason: str,
+    *,
+    user_authorized: bool = False,
+) -> PlannerResult:
     return PlannerResult(
         status=PlannerStatus.SUCCESS,
         duration_ms=0.0,
@@ -25,6 +30,7 @@ def _plan(tool_name: str, reason: str) -> PlannerResult:
             arguments={},
             confidence=1.0,
             reason=reason,
+            user_authorized=user_authorized,
         ),
     )
 
@@ -241,3 +247,101 @@ def test_capability_resolver_cannot_bypass_action_confirmation() -> None:
 
     assert result.execution is not None
     assert result.execution.status is ExecutionStatus.CONFIRMATION_REQUIRED
+
+
+
+def test_trusted_capability_resolver_can_authorize_action() -> None:
+    plugin = _plugin(
+        plugin_name="plugin.action-authorized",
+        domain_name="authorized",
+        capability_name="run",
+        resolver=ResolverDefinition(
+            "authorized.run",
+            lambda message: ResolutionResult.handled_result(
+                _plan(
+                    "authorized_action",
+                    "explicit user action",
+                    user_authorized=True,
+                )
+            ),
+        ),
+        tool_name="authorized_action",
+        permission=ToolPermission.ACTION,
+    )
+
+    runtime = WilfredRuntime(
+        provider=lambda *args: "{}",
+        system_prompt="Test.",
+        plugins=(plugin,),
+    )
+
+    result = runtime.execute_goal("do it now")
+
+    assert result.execution is not None
+    assert result.execution.status is ExecutionStatus.SUCCESS
+    assert result.execution.value == {"tool": "authorized_action"}
+
+
+def test_planner_cannot_self_authorize_action_with_extra_json_field() -> None:
+    def provider(message, prompt, tools):
+        return json.dumps(
+            {
+                "tool_name": "planned_action",
+                "arguments": {},
+                "confidence": 1.0,
+                "reason": "planner action",
+                "user_authorized": True,
+            }
+        )
+
+    plugin = _plugin(
+        plugin_name="plugin.planned-action",
+        domain_name="planned",
+        capability_name="run",
+        resolver=ResolverDefinition(
+            "planned.run",
+            lambda message: ResolutionResult.not_handled_result(),
+        ),
+        tool_name="planned_action",
+        permission=ToolPermission.ACTION,
+    )
+
+    runtime = WilfredRuntime(
+        provider=provider,
+        system_prompt="Test.",
+        plugins=(plugin,),
+    )
+
+    result = runtime.execute_goal("do it")
+
+    assert result.planning.plan is not None
+    assert result.planning.plan.user_authorized is False
+    assert result.execution is not None
+    assert result.execution.status is ExecutionStatus.CONFIRMATION_REQUIRED
+
+
+def test_explicit_runtime_confirmation_remains_supported() -> None:
+    plugin = _plugin(
+        plugin_name="plugin.confirmed-action",
+        domain_name="confirmed",
+        capability_name="run",
+        resolver=ResolverDefinition(
+            "confirmed.run",
+            lambda message: ResolutionResult.handled_result(
+                _plan("confirmed_action", "needs confirmation")
+            ),
+        ),
+        tool_name="confirmed_action",
+        permission=ToolPermission.ACTION,
+    )
+
+    runtime = WilfredRuntime(
+        provider=lambda *args: "{}",
+        system_prompt="Test.",
+        plugins=(plugin,),
+    )
+
+    result = runtime.execute_goal("do it", confirmed=True)
+
+    assert result.execution is not None
+    assert result.execution.status is ExecutionStatus.SUCCESS

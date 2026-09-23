@@ -12,7 +12,7 @@ import zipfile
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-CORE_REF = "827bbac1038b6591f88648e5b69e50ae66834c19"
+CORE_REF = "ee43244061f042d6465524beac80aaed0238767c"
 CORE_ARCHIVE = (
     "https://github.com/keriol/butler-core/archive/"
     f"{CORE_REF}.tar.gz"

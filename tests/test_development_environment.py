@@ -93,7 +93,7 @@ class DevelopmentEnvironmentTests(unittest.TestCase):
             dependencies[0],
             "butler-core @ "
             "https://github.com/keriol/butler-core/archive/"
-            "827bbac1038b6591f88648e5b69e50ae66834c19.tar.gz",
+            "ee43244061f042d6465524beac80aaed0238767c.tar.gz",
         )
 
     def test_commands_are_documented(self) -> None:

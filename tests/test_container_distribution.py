@@ -27,7 +27,7 @@ def test_development_line_consumes_independent_hap() -> None:
 
     assert 'version = "0.2.3.dev0"' in pyproject
     assert (
-        "827bbac1038b6591f88648e5b69e50ae66834c19"
+        "ee43244061f042d6465524beac80aaed0238767c"
         in pyproject
     )
     assert "butler-home-assistant" in dockerfile
