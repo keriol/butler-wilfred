@@ -6,6 +6,7 @@ from butler_core import (
     ExecutionPolicy,
     PlannerProvider,
     ResolverDefinition,
+    ToolPlanSequence,
 )
 
 from wilfred import __version__
@@ -28,6 +29,10 @@ from wilfred.plugins import (
     load_plugins,
 )
 from wilfred.registry import ToolRegistry
+from wilfred.sequential import (
+    SequenceExecutionResult,
+    SequentialExecution,
+)
 
 
 class WilfredRuntime:
@@ -60,6 +65,10 @@ class WilfredRuntime:
         self._capability_registry = capability_registry
         self._acknowledgement_adapter = acknowledgement_adapter
         self._acknowledgement_text = acknowledgement_text
+        self._sequential_execution = SequentialExecution(
+            registry,
+            policy=policy,
+        )
         self._planned_execution = PlannedExecution(
             registry,
             provider=provider,
@@ -125,6 +134,12 @@ class WilfredRuntime:
             message,
             confirmed=confirmed,
         )
+
+    def execute_sequence(
+        self,
+        plan: ToolPlanSequence,
+    ) -> SequenceExecutionResult:
+        return self._sequential_execution.execute(plan)
 
     def _acknowledge_provider_latency(self) -> None:
         adapter = self._acknowledgement_adapter

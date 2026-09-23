@@ -80,6 +80,24 @@ When the deadline is exceeded, Wilfred returns a structured timeout result.
 The worker thread cannot forcibly terminate arbitrary Python code, so handlers
 must remain bounded and cooperative.
 
+## Sequential execution
+
+Wilfred can execute an already-resolved `ToolPlanSequence` in declared order
+through `SequentialExecution` or `WilfredRuntime.execute_sequence()`.
+
+Each step is still executed by the normal Execution Engine. Argument
+validation, permission policy, confirmation requirements, timeouts and
+structured execution results therefore remain unchanged.
+
+Sequence execution stops at the first non-successful step. A step can carry
+trusted explicit-user authorization through the Core `ToolPlan.user_authorized`
+contract; authorization is evaluated per step rather than applied globally to
+the whole sequence.
+
+Sequential execution is orchestration, not outcome verification. A sequence of
+successful tool dispatches does not by itself prove that an external system
+reached the intended state.
+
 ## Current boundary
 
 The Execution Engine remains the single-tool execution layer.

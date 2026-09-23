@@ -71,6 +71,11 @@ except PackageNotFoundError:
     __version__ = "0+unknown"
 
 from wilfred.runtime import WilfredRuntime
+from wilfred.sequential import (
+    SequenceExecutionResult,
+    SequenceExecutionStatus,
+    SequentialExecution,
+)
 
 __all__ = [
     "ButlerIdentity",
@@ -100,6 +105,9 @@ __all__ = [
     "ReadActionVerifyResult",
     "ReadActionVerifyWorkflow",
     "RuntimeConfig",
+    "SequenceExecutionResult",
+    "SequenceExecutionStatus",
+    "SequentialExecution",
     "SQLiteWorkflowStore",
     "ToolDefinition",
     "ToolPermission",
