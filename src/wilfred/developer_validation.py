@@ -184,6 +184,14 @@ def validate_repository(
             "Expected project "
             f"{EXPECTED_PROJECT_NAME!r}, found {project_name!r}."
         )
+        return {
+            "ok": False,
+            "repository": {
+                "root": str(repository_root),
+                "project": project_name,
+            },
+            "checks": [project_check],
+        }
 
     branch_result = runner(
         ("git", "branch", "--show-current"),
