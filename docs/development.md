@@ -21,6 +21,48 @@ Run the complete suite:
 .venv/bin/python -m pytest -q
 ~~~
 
+## Read-only repository validation
+
+Wilfred includes a public, repository-local validation command for mechanical
+development checks:
+
+~~~bash
+wilfred validate
+~~~
+
+The command is read-only. It reports:
+
+- the detected Wilfred repository root and project identity;
+- current branch and HEAD;
+- the configured comparison ref, defaulting to `origin/main`;
+- ahead/behind divergence when that ref is available locally;
+- staged, unstaged and untracked working-tree state;
+- `git diff --check` for unstaged and staged changes;
+- source/test compilation;
+- pytest results.
+
+It does not fetch, pull, stage, commit, merge, close issues, change versions,
+install dependencies or deploy anything.
+
+Focused tests can be run without the full suite:
+
+~~~bash
+wilfred validate --test tests/test_runtime.py
+~~~
+
+Multiple `--test` values are accepted. Add `--full` when the complete suite
+should run after the focused targets:
+
+~~~bash
+wilfred validate \
+  --test tests/test_runtime.py \
+  --test tests/test_capability_resolvers.py \
+  --full
+~~~
+
+Use `--base-ref` when comparing against another already-local Git ref. The
+command never performs network synchronization implicitly.
+
 The `dev` extra contains development, packaging and HTTP test tools.
 Normal Wilfred installations do not install them. Production HTTP support
 is available separately through the `http` extra.
