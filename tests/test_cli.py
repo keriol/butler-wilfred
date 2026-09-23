@@ -125,3 +125,41 @@ def test_no_command_preserves_existing_cli() -> None:
 
     payload = json.loads(output)
     assert payload["runtime"] == "standalone-bootstrap"
+
+
+def test_validate_command_returns_structured_result(monkeypatch, tmp_path) -> None:
+    monkeypatch.setattr(
+        "wilfred.__main__.validate_repository",
+        lambda repo, **kwargs: {
+            "ok": True,
+            "repository": {
+                "root": str(repo),
+                "branch": "feature/example",
+            },
+            "checks": [
+                {
+                    "name": "compile",
+                    "ok": True,
+                    "exit_code": 0,
+                }
+            ],
+        },
+    )
+
+    result, output, errors = run_cli(
+        [
+            "validate",
+            "--repo",
+            str(tmp_path),
+            "--test",
+            "tests/test_runtime.py",
+            "--full",
+        ]
+    )
+
+    assert result == 0
+    assert errors == ""
+    payload = json.loads(output)
+    assert payload["ok"] is True
+    assert payload["repository"]["branch"] == "feature/example"
+    assert payload["checks"][0]["name"] == "compile"

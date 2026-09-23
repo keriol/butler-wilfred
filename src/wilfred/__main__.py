@@ -14,6 +14,10 @@ from wilfred.config import (
     RuntimeConfig,
     load_config,
 )
+from wilfred.developer_validation import (
+    DEFAULT_BASE_REF,
+    validate_repository,
+)
 from wilfred.native import register_native_tools
 from wilfred.providers import (
     OpenAIPlannerProvider,
@@ -146,6 +150,42 @@ def build_parser() -> argparse.ArgumentParser:
         help="List Wilfred native tools.",
     )
 
+    validate = commands.add_parser(
+        "validate",
+        help="Run read-only developer validation for a Wilfred checkout.",
+    )
+    validate.add_argument(
+        "--repo",
+        type=Path,
+        default=Path.cwd(),
+        help="Repository path. Defaults to the current directory.",
+    )
+    validate.add_argument(
+        "--base-ref",
+        default=DEFAULT_BASE_REF,
+        help=(
+            "Git ref used for divergence reporting. "
+            f"Defaults to {DEFAULT_BASE_REF}."
+        ),
+    )
+    validate.add_argument(
+        "--test",
+        action="append",
+        default=[],
+        metavar="PYTEST_TARGET",
+        help=(
+            "Run a focused pytest target. May be repeated. "
+            "Without --test the full suite runs."
+        ),
+    )
+    validate.add_argument(
+        "--full",
+        action="store_true",
+        help=(
+            "Run the full pytest suite after any focused --test targets."
+        ),
+    )
+
     domains = commands.add_parser(
         "domains",
         help="List domains declared by configured plugins.",
@@ -253,6 +293,31 @@ def run_native_command(command: str) -> int:
         )
     )
     return 0
+
+
+def run_validate_command(
+    *,
+    repo: Path,
+    base_ref: str,
+    test_targets: Sequence[str],
+    full_tests: bool,
+) -> int:
+    result = validate_repository(
+        repo,
+        base_ref=base_ref,
+        test_targets=test_targets,
+        full_tests=full_tests,
+    )
+
+    print(
+        json.dumps(
+            result,
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+    )
+
+    return 0 if result["ok"] else 1
 
 
 def run_discovery_command(
@@ -404,6 +469,14 @@ def main(
 
     if arguments.command in {"status", "tools"}:
         return run_native_command(arguments.command)
+
+    if arguments.command == "validate":
+        return run_validate_command(
+            repo=arguments.repo,
+            base_ref=arguments.base_ref,
+            test_targets=arguments.test,
+            full_tests=arguments.full,
+        )
 
     if arguments.command in {"domains", "capabilities"}:
         effective_environment = (
