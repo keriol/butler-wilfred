@@ -68,11 +68,13 @@ Start the standalone runtime:
 wilfred
 ```
 
-Expected output:
+Expected shape:
 
 ```json
-{"locale": "en", "log_level": "INFO", "name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.2.1"}
+{"locale": "en", "log_level": "INFO", "name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "<installed-version>"}
 ```
+
+The exact version reflects the installed Wilfred release/development artifact.
 
 The module entrypoint is equivalent:
 
@@ -215,9 +217,10 @@ A configured plugin factory uses the form:
 
     package.module:factory
 
-For the official Home Assistant plugin:
-
-    wilfred_home_assistant.bootstrap:create_plugin_from_environment
+For the official Home Assistant plugin, use the factory exposed by the
+installed HAP release/development artifact. Historical examples may still show
+the earlier `wilfred_home_assistant` package identity because immutable release
+records preserve the dependency shape of their time.
 
 The factory can be selected explicitly:
 
