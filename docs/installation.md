@@ -68,11 +68,13 @@ Start the standalone runtime:
 wilfred
 ```
 
-Expected output:
+Expected output has this shape:
 
 ```json
-{"locale": "en", "log_level": "INFO", "name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "0.2.1"}
+{"locale": "en", "log_level": "INFO", "name": "Wilfred", "runtime": "standalone-bootstrap", "status": "ok", "version": "<installed-version>"}
 ```
+
+The exact version must match the release or development artifact you installed.
 
 The module entrypoint is equivalent:
 
