@@ -156,8 +156,11 @@ distribution and the reference Docker distribution.
 
 The canonical integration repository is
 [`keriol/home-assistant-plugin`](https://github.com/keriol/home-assistant-plugin).
-Its consumer-neutral HAP migration is active development and is not
-retroactively part of the Wilfred 0.2.2 release contract.
+
+HAP is now an independently released Butler Core-based plugin. HAP `0.3.0`
+is part of the Ignition network baseline, but that does not retroactively change
+the immutable dependency BOM of Wilfred `0.2.2`. Installations should follow
+the exact compatibility guidance of the Wilfred artifact/distribution they use.
 
 The following remain outside the completed Public Alpha scope:
 - a complete collection of native Butler capabilities;
