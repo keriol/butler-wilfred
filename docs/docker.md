@@ -13,8 +13,10 @@ The current Public Alpha reference composition contains:
 
 The canonical Home Assistant integration repository is
 [`keriol/home-assistant-plugin`](https://github.com/keriol/home-assistant-plugin).
-The plugin was originally composed as a Wilfred-specific dependency and is now
-being migrated under HAP-004 toward a consumer-neutral Butler Core boundary.
+The plugin was originally composed as a Wilfred-specific dependency and later
+moved to a consumer-neutral Butler Core boundary. HAP `0.3.0` is now a
+released Ignition baseline.
+
 Historical Wilfred release BOMs remain authoritative for the exact dependency
 that each released image actually contained.
 
@@ -87,9 +89,9 @@ development distribution. Version-specific files under
 `distribution/releases/` are immutable release evidence and may legitimately
 retain the historical repository/package identity used by that release.
 
-Do not infer the active HAP-004 consumer-neutral migration from an older Wilfred
-BOM. A future Wilfred release adopts a new HAP dependency baseline only through
-explicit release scope and evidence.
+Do not infer current HAP adoption from an older Wilfred BOM. A Wilfred release
+adopts a HAP dependency baseline only through explicit release scope and
+evidence.
 
 ## Container artifact checkout
 
