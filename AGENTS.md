@@ -14,6 +14,24 @@ canonical ecosystem map:
 
 Do not import private Alfred assumptions into Wilfred.
 
+## First installation requests
+
+If the user is installing Wilfred for the first time, do not start from the
+feature-design workflow.
+
+Follow the canonical public installation path instead:
+
+1. `docs/onboarding.md`;
+2. `docs/installation.md`;
+3. `docs/docker.md` when Docker is the chosen distribution;
+4. only add AI, HTTP or external plugins after the base deterministic runtime is healthy.
+
+Prefer a released Wilfred artifact/BOM for a normal first installation. Use
+development `main` only when the user explicitly wants development/testing.
+
+Never ask the user to paste credentials or tokens into chat or commit them.
+Diagnose the currently failing boundary before enabling the next optional layer.
+
 ## This repository owns
 
 - runtime composition;
