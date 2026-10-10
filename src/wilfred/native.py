@@ -10,9 +10,9 @@ from wilfred.models import (
 from wilfred.registry import ToolRegistry
 
 
-def _runtime_status() -> dict[str, str]:
+def _runtime_status(identity_name: str = 'Wilfred') -> dict[str, str]:
     return {
-        "name": "Wilfred",
+        "name": identity_name,
         "status": "ok",
         "version": __version__,
         "runtime": "standalone",
@@ -33,6 +33,8 @@ def describe_tool(
 
 def register_native_tools(
     registry: ToolRegistry,
+    *,
+    identity_name: str = 'Wilfred',
 ) -> None:
     registry.register(
         ToolDefinition(
@@ -41,7 +43,7 @@ def register_native_tools(
                 "Return public status information "
                 "about the Wilfred runtime."
             ),
-            handler=_runtime_status,
+            handler=lambda: _runtime_status(identity_name),
             parameters={
                 "type": "object",
                 "properties": {},

@@ -228,3 +228,38 @@ def test_runtime_is_public_api():
     from wilfred.runtime import WilfredRuntime
 
     assert PublicWilfredRuntime is WilfredRuntime
+
+
+def test_runtime_uses_instance_identity_without_relabeling_tools():
+    from wilfred.config import ButlerIdentity
+    from wilfred.runtime import WilfredRuntime
+
+    for name in ("Wilfred", "Manfred"):
+        runtime = WilfredRuntime(
+            provider=_provider("wilfred_status"),
+            system_prompt="Public Butler identity test.",
+            identity=ButlerIdentity(name=name, locale="en"),
+        )
+        assert runtime.describe_runtime()["name"] == name
+        assert runtime.tool_names() == ["wilfred_status", "wilfred_tools"]
+        result = runtime.execute_goal("what is your status?")
+        assert result.execution.value["name"] == name
+
+
+def test_runtime_rejects_invalid_identity():
+    import pytest
+    from wilfred.config import ButlerIdentity
+    from wilfred.runtime import WilfredRuntime
+
+    with pytest.raises(ValueError, match="identity name"):
+        WilfredRuntime(
+            provider=_provider(None),
+            system_prompt="Test.",
+            identity=ButlerIdentity(name="  "),
+        )
+    with pytest.raises(TypeError, match="identity must"):
+        WilfredRuntime(
+            provider=_provider(None),
+            system_prompt="Test.",
+            identity="Manfred",
+        )
