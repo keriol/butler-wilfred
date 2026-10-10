@@ -9,6 +9,7 @@ from butler_core import (
 )
 
 from wilfred import __version__
+from wilfred.config import ButlerIdentity
 from wilfred.capability_registry import CapabilityRegistry
 from wilfred.native import (
     describe_tool,
@@ -38,6 +39,7 @@ class WilfredRuntime:
         *,
         provider: PlannerProvider,
         system_prompt: str,
+        identity: ButlerIdentity | None = None,
         plugins: Iterable[PluginDefinition] = (),
         model: str | None = None,
         enabled: bool = True,
@@ -46,6 +48,12 @@ class WilfredRuntime:
         acknowledgement_adapter: OutputAdapter | None = None,
         acknowledgement_text: str | None = None,
     ) -> None:
+        resolved_identity = identity if identity is not None else ButlerIdentity()
+        if not isinstance(resolved_identity, ButlerIdentity):
+            raise TypeError('identity must be ButlerIdentity')
+        if not resolved_identity.name.strip() or len(resolved_identity.name.strip()) > 80:
+            raise ValueError('identity name must be between 1 and 80 characters')
+        self._identity = resolved_identity
         registry = ToolRegistry()
         loaded_plugins = tuple(plugins)
         capability_registry = CapabilityRegistry.from_plugins(loaded_plugins)
@@ -53,7 +61,7 @@ class WilfredRuntime:
         capability_resolvers = capability_registry.resolver_definitions()
         composed_resolvers = legacy_resolvers + capability_resolvers
 
-        register_native_tools(registry)
+        register_native_tools(registry, identity_name=resolved_identity.name.strip())
         load_plugins(registry, loaded_plugins)
 
         self._registry = registry
@@ -84,7 +92,7 @@ class WilfredRuntime:
         """Return public, credential-free runtime metadata."""
 
         return {
-            "name": "Wilfred",
+            "name": self._identity.name.strip(),
             "status": "ok",
             "version": __version__,
             "runtime": "goal-runtime",
