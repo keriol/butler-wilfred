@@ -260,3 +260,43 @@ unsupported_identity_mode = true
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class WilfredIdentityExtendedConfigTests(unittest.TestCase):
+    def test_file_declares_aliases_and_local_picture(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "identity.toml"
+            path.write_text(
+                '[identity]\nname = "Manfred"\nlocale = "it-IT"\n'
+                'aliases = ["Manny", "Man"]\n'
+                'description = "Test Butler"\n'
+                'profile_picture = "assets/profile.png"\n',
+                encoding="utf-8",
+            )
+            config = load_config(config_file=path, environ={})
+        self.assertEqual(config.identity.name, "Manfred")
+        self.assertEqual(config.identity.aliases, ("Manny", "Man"))
+        self.assertEqual(config.identity.description, "Test Butler")
+        self.assertEqual(config.identity.profile_picture, "assets/profile.png")
+
+    def test_blank_duplicate_and_traversal_fail(self):
+        cases = [
+            ('aliases = ["Wilfred"]', "duplicate"),
+            ('aliases = ["One", " one "]', "duplicate"),
+            ('aliases = [""]', "1-80"),
+            ('profile_picture = "../private.png"', "relative PNG"),
+            ('profile_picture = "/tmp/private.png"', "relative PNG"),
+            ('profile_picture = "https://example.org/profile.png"', "relative PNG"),
+        ]
+        for field, error in cases:
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as temp:
+                path = Path(temp) / "identity.toml"
+                path.write_text('[identity]\nname = "Wilfred"\n' + field + '\n', encoding="utf-8")
+                with self.assertRaisesRegex(ConfigurationError, error):
+                    load_config(config_file=path, environ={})
+
+    def test_no_picture_and_configured_name_precedence(self):
+        cfg = load_config(environ={"WILFRED_NAME": "Manfred"}, cli_overrides={})
+        self.assertEqual(cfg.identity.name, "Manfred")
+        self.assertEqual(cfg.identity.aliases, ())
+        self.assertIsNone(cfg.identity.profile_picture)

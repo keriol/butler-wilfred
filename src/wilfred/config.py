@@ -34,6 +34,9 @@ _ALLOWED_IDENTITY_KEYS = frozenset(
     {
         "name",
         "locale",
+        "aliases",
+        "description",
+        "profile_picture",
     }
 )
 
@@ -54,6 +57,9 @@ class ButlerIdentity:
 
     name: str = "Wilfred"
     locale: str = "en"
+    aliases: tuple[str, ...] = ()
+    description: str = ""
+    profile_picture: str | None = None
 
 
 @dataclass(frozen=True)
@@ -97,7 +103,7 @@ def _reject_unknown(
 
 def _read_config_file(
     path: Path,
-) -> dict[str, str]:
+) -> dict[str, Any]:
     if not path.is_file():
         raise ConfigurationError(
             f"Configuration file does not exist: {path}"
@@ -141,7 +147,7 @@ def _read_config_file(
         location="[runtime] keys",
     )
 
-    values: dict[str, str] = {}
+    values: dict[str, Any] = {}
 
     for key in ("name", "locale"):
         if key not in identity:
@@ -155,6 +161,19 @@ def _read_config_file(
             )
 
         values[key] = value
+
+    if "aliases" in identity:
+        aliases = identity["aliases"]
+        if not isinstance(aliases, list) or not all(isinstance(x, str) for x in aliases):
+            raise ConfigurationError("identity.aliases must be an array of strings.")
+        values["aliases"] = tuple(aliases)
+
+    for key in ("description", "profile_picture"):
+        if key in identity:
+            value = identity[key]
+            if not isinstance(value, str):
+                raise ConfigurationError(f"identity.{key} must be a string.")
+            values[key] = value
 
     if "log_level" in runtime:
         value = runtime["log_level"]
@@ -208,7 +227,7 @@ def _cli_values(
 
 
 def _validate(
-    values: Mapping[str, str],
+    values: Mapping[str, Any],
 ) -> RuntimeConfig:
     name = values["name"].strip()
 
@@ -240,10 +259,49 @@ def _validate(
             f"{allowed}."
         )
 
+    aliases = values.get("aliases", ())
+    if not isinstance(aliases, tuple) or not all(isinstance(x, str) for x in aliases):
+        raise ConfigurationError("identity.aliases must be a tuple of strings.")
+    normalized = [name.casefold()]
+    for alias in aliases:
+        candidate = alias.strip()
+        if not candidate or len(candidate) > 80:
+            raise ConfigurationError("identity.aliases must contain names of 1-80 characters.")
+        key = candidate.casefold()
+        if key in normalized:
+            raise ConfigurationError("identity.aliases duplicate a canonical name or alias.")
+        normalized.append(key)
+
+    description = values.get("description", "")
+    if not isinstance(description, str) or len(description) > 500:
+        raise ConfigurationError("identity.description must be a string of at most 500 characters.")
+
+    picture = values.get("profile_picture")
+    if picture is not None:
+        if not isinstance(picture, str):
+            raise ConfigurationError("identity.profile_picture must be a string.")
+        # Reference is intentionally NOT loaded or exposed in runtime metadata.
+        # No absolute path, traversal or network scheme is admitted.
+        pure = Path(picture)
+        if (
+            not picture.strip()
+            or picture != picture.strip()
+            or pure.is_absolute()
+            or "\\\\" in picture
+            or "\\" in picture
+            or ":" in picture
+            or any(segment in ("", ".", "..") for segment in picture.split("/"))
+            or pure.suffix.lower() != ".png"
+        ):
+            raise ConfigurationError("identity.profile_picture must be a relative PNG path without traversal.")
+
     return RuntimeConfig(
         identity=ButlerIdentity(
             name=name,
             locale=locale,
+            aliases=tuple(alias.strip() for alias in aliases),
+            description=description,
+            profile_picture=picture,
         ),
         log_level=log_level,
     )
@@ -273,6 +331,9 @@ def load_config(
         "name": "Wilfred",
         "locale": "en",
         "log_level": "INFO",
+        "aliases": (),
+        "description": "",
+        "profile_picture": None,
     }
 
     if config_file is not None:

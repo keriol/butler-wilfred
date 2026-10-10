@@ -93,3 +93,36 @@ The runtime rejects:
 
 Configuration errors are written to standard error and the command exits
 with status code `2`.
+
+
+## Optional per-instance Asgard identity metadata (WILF-076)
+
+Wilfred can configure optional presentation and exact addressing aliases in
+its **host-owned** TOML configuration:
+
+```toml
+[identity]
+name = "Wilfred"
+locale = "en"
+aliases = ["Willy"]
+description = "Butler reference instance"
+profile_picture = "assets/profile.png"
+
+[runtime]
+log_level = "INFO"
+```
+
+`assets/profile.png` is the committed project portrait. A different Wilfred
+instance (such as a Manfred proving installation) may use the same relative
+filename in **its own deployment root** or a different relative PNG path.
+
+Aliases are exact `strip().casefold()` synonyms; blank or duplicate aliases
+are rejected. The picture property is an **unloaded reference**, not a file
+reader, HTTP URL or client manifest field. Absolute paths, traversal and
+network URLs are rejected. Wilfred does not fetch an image or publish private
+filesystem paths.
+
+The parser continues to reject unknown keys. The same configured name is
+used by `WilfredRuntime` when its composition passes the resolved identity.
+Asgard and Midgard integration and actual client picture publication remain
+separate, tracked work.
