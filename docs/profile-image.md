@@ -1,11 +1,18 @@
-# Wilfred profile image
+# Wilfred profile portrait
 
-Wilfred's official portrait is the public GitHub account avatar for `keriol` (GitHub account ID `259832917`), copied once into `assets/profile.png`.
+The official Wilfred image is a **one-time, locally vendored copy** of the GitHub account avatar for [keriol](https://github.com/keriol), with account ID `259832917`.
 
-The asset is local to this Wilfred repository. The final Butler installation should own its copy rather than requesting GitHub avatar bytes at runtime. Any future refresh is a separately reviewed Git commit.
+- Source: `https://avatars.githubusercontent.com/u/259832917?v=4&s=512`
+- Repository asset: **`assets/profile.png`**
+- The source was downloaded and validated in GitHub Actions on branch `assets/wilf-075-github-avatar`: HTTPS download, size/dimension bounds, image decoding, re-encoding as PNG without EXIF; the temporary importer workflow was removed before merge.
+- A lightweight repository test validates the committed file's PNG signature, IHDR and dimension/size limits.
 
-**Integration boundary:** Wilfred's current TOML `[identity]` allows `name` and `locale` only. `assets/profile.png` is a packaged project asset, not yet a configured `profile_picture` property or an image delivered through Asgard/Midgard/Bifröst. The source image must not be treated as authentication material.
+This is an **asset**, not an online dependency. No runtime download from GitHub and no Pillow dependency in Wilfred itself.
 
-The initial avatar import is performed on an isolated feature branch by the temporary GitHub Actions workflow `import-wilfred-portrait.yml`. Its output is a validated PNG (bounded size and dimensions, EXIF removed by re-encoding); the workflow is to be removed from the final branch after the asset is obtained. No production/runtime dependency on Pillow is introduced.
+## Identity and integration boundaries
 
-Follow-up: ASG-002, MID-009, BIF-015 and Wilfred identity configuration.
+The Wilfred runtime already accepts a configured instance name via its public `[identity] name` and `WILFRED_NAME` options. Its current parser **does not accept** `aliases`, `description` or `profile_picture` settings. This file is therefore not yet automatically connected to its runtime metadata or published via Asgard/Midgard/Bifröst manifests.
+
+The concrete Butler owns the profile image. Asgard projects identity, Midgard transports optional sanitized presentation metadata (MID-009), and Bifröst serializes it (BIF-015), once those features exist. A missing image must not prevent routing.
+
+Reference: WILF-075, ASG-002, MID-009, BIF-015. Any later portrait refresh requires an explicit reviewed commit.
