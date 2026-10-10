@@ -267,10 +267,10 @@ class WilfredIdentityExtendedConfigTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "identity.toml"
             path.write_text(
-                '[identity]\\nname = "Manfred"\\nlocale = "it-IT"\\n'
-                'aliases = ["Manny", "Man"]\\n'
-                'description = "Test Butler"\\n'
-                'profile_picture = "assets/profile.png"\\n',
+                '[identity]\nname = "Manfred"\nlocale = "it-IT"\n'
+                'aliases = ["Manny", "Man"]\n'
+                'description = "Test Butler"\n'
+                'profile_picture = "assets/profile.png"\n',
                 encoding="utf-8",
             )
             config = load_config(config_file=path, environ={})
@@ -291,7 +291,7 @@ class WilfredIdentityExtendedConfigTests(unittest.TestCase):
         for field, error in cases:
             with self.subTest(field=field), tempfile.TemporaryDirectory() as temp:
                 path = Path(temp) / "identity.toml"
-                path.write_text('[identity]\\nname = "Wilfred"\\n' + field + '\\n', encoding="utf-8")
+                path.write_text('[identity]\nname = "Wilfred"\n' + field + '\n', encoding="utf-8")
                 with self.assertRaisesRegex(ConfigurationError, error):
                     load_config(config_file=path, environ={})
 
