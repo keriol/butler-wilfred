@@ -1,0 +1,66 @@
+name: Import Wilfred portrait (WILF-075)
+
+on:
+  push:
+    branches:
+      - assets/wilf-075-github-avatar
+
+permissions:
+  contents: write
+
+jobs:
+  import-avatar:
+    if: github.repository == 'keriol/butler-wilfred'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install one-time image conversion tool
+        run: python -m pip install "Pillow>=11,<13"
+      - name: Fetch and validate GitHub avatar
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --proto '=https' --tlsv1.2 -fsSL --retry 3 --max-time 30 \
+            'https://avatars.githubusercontent.com/u/259832917?v=4&s=512' \
+            -o "$RUNNER_TEMP/wilfred-avatar-source"
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageOps
+          root = Path.cwd()
+          source = Path(__import__("os").environ["RUNNER_TEMP"]) / "wilfred-avatar-source"
+          assert 0 < source.stat().st_size <= 3 * 1024 * 1024, "unexpected avatar size"
+          with Image.open(source) as original:
+              original.verify()
+          with Image.open(source) as original:
+              assert original.format in {"JPEG", "PNG", "WEBP"}, "unexpected source format"
+              assert 64 <= original.width <= 2048
+              assert 64 <= original.height <= 2048
+              picture = ImageOps.exif_transpose(original).convert("RGBA")
+              picture.thumbnail((512, 512))
+              assert picture.width >= 64 and picture.height >= 64
+              dest = root / "assets" / "profile.png"
+              dest.parent.mkdir(parents=True, exist_ok=True)
+              picture.save(dest, "PNG", optimize=True)
+          assert dest.read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
+          assert 0 < dest.stat().st_size < 3 * 1024 * 1024
+          print("Verified Wilfred profile:", dest, dest.stat().st_size)
+          PY
+      - name: Commit portrait to feature branch only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "assets/wilf-075-github-avatar"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- assets/profile.png
+          if git diff --cached --quiet; then
+            echo "Portrait already up to date."
+          else
+            git commit -m "WILF-075: vendor verified Wilfred GitHub avatar"
+            git push origin HEAD:assets/wilf-075-github-avatar
+          fi
